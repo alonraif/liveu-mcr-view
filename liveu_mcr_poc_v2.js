@@ -1,5 +1,5 @@
 // Version tracking for cache busting
-const APP_VERSION = '20250128-002';
+const APP_VERSION = '20250128-003';
 console.log(`%c🚀 LiveU MCR Dashboard v${APP_VERSION}`, 'color: #4CAF50; font-weight: bold; font-size: 14px;');
 
 const STORAGE_KEYS = {
@@ -2957,24 +2957,27 @@ function buildAnchorKey(node, selector, defaultSide) {
 }
 
 function createCurvedPath(fromX, fromY, toX, toY, fromRect, toRect) {
+    // Create orthogonal (right-angle) path instead of curved
+    // This makes it look more like an engineering/technical diagram
+
     const dx = toX - fromX;
-    const dy = toY - fromY;
+    const minHorizontalSegment = 40; // Minimum horizontal line segment
 
-    const baselineOffset = Math.max(Math.abs(dx) * 0.25, 80);
-    const direction = dx >= 0 ? 1 : -1;
+    // Calculate the midpoint for the horizontal segment
+    const midX = fromX + Math.max(Math.abs(dx) / 2, minHorizontalSegment);
 
-    const overlapY = (fromRect.bottom > toRect.top && fromRect.top < toRect.bottom);
-    const verticalCurve = overlapY
-        ? Math.max(120, Math.abs(dy) * 0.6)
-        : Math.max(60, Math.abs(dy) * 0.4);
-    const curveSign = dy < 0 ? -1 : 1;
-
-    const cp1X = fromX + direction * baselineOffset;
-    const cp1Y = fromY + curveSign * verticalCurve;
-    const cp2X = toX - direction * baselineOffset;
-    const cp2Y = toY - curveSign * verticalCurve;
-
-    return `M ${fromX},${fromY} C ${cp1X},${cp1Y} ${cp2X},${cp2Y} ${toX},${toY}`;
+    // Create path with right angles:
+    // Start -> horizontal -> vertical -> horizontal -> end
+    if (dx >= 0) {
+        // Normal left-to-right flow
+        return `M ${fromX},${fromY} L ${midX},${fromY} L ${midX},${toY} L ${toX},${toY}`;
+    } else {
+        // Right-to-left (rare case)
+        // Need to route around to avoid overlapping cards
+        const routeOffset = 60;
+        const aboveBoth = Math.min(fromRect.top, toRect.top) - routeOffset;
+        return `M ${fromX},${fromY} L ${fromX + routeOffset},${fromY} L ${fromX + routeOffset},${aboveBoth} L ${toX - routeOffset},${aboveBoth} L ${toX - routeOffset},${toY} L ${toX},${toY}`;
+    }
 }
 
 function scheduleConnectionRedraw() {
