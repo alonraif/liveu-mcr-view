@@ -1473,7 +1473,23 @@ function updateCanvasTransform(options = {}) {
 
     canvas.style.transform = `translate(${mcrTransform.translateX}px, ${mcrTransform.translateY}px) scale(${mcrTransform.scale})`;
 
-    scheduleConnectionRedraw();
+    // If transition is disabled (no-transition class), redraw immediately
+    // Otherwise, wait for transition to complete
+    if (canvas.classList.contains('no-transition')) {
+        scheduleConnectionRedraw();
+    } else {
+        // Wait for transition to complete before redrawing connections
+        canvas.addEventListener('transitionend', onCanvasTransitionEnd, { once: true });
+        // Also schedule a fallback redraw in case transitionend doesn't fire
+        setTimeout(() => scheduleConnectionRedraw(), 350);
+    }
+}
+
+function onCanvasTransitionEnd(e) {
+    // Only redraw if the transform property completed
+    if (e.propertyName === 'transform') {
+        scheduleConnectionRedraw();
+    }
 }
 
 function clampTransformToBounds(container, canvas) {
