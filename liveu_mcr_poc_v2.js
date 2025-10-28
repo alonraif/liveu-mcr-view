@@ -1,3 +1,7 @@
+// Version tracking for cache busting
+const APP_VERSION = '20250128-001';
+console.log(`%c🚀 LiveU MCR Dashboard v${APP_VERSION}`, 'color: #4CAF50; font-weight: bold; font-size: 14px;');
+
 const STORAGE_KEYS = {
     inventories: 'liveu-mcr-inventories',
     scriptEvents: 'liveu-mcr-script-events',
