@@ -927,6 +927,20 @@ console.log('Loaded inventories:', Object.keys(inventories));
 Object.keys(inventories).forEach(key => {
     console.log(`  ${key}: ${inventories[key].equipment.length} devices`);
 });
+
+// Check if this is first load (no positions set) and apply auto-layout
+let needsAutoLayout = false;
+Object.keys(inventories).forEach(inventoryKey => {
+    if (inventories[inventoryKey] && inventories[inventoryKey].equipment) {
+        const equipment = inventories[inventoryKey].equipment;
+        // Check if equipment positions are all default/overlapping
+        const hasPositions = equipment.some(eq => eq.x !== undefined && eq.y !== undefined && (eq.x !== 100 || eq.y !== 100));
+        if (!hasPositions && equipment.length > 0) {
+            needsAutoLayout = true;
+        }
+    }
+});
+
 enforceChannelStreamingConsistency();
 
 // LiveU Entity Definitions
@@ -1227,6 +1241,18 @@ const PRESET_SCRIPTS = {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    // Apply auto-layout if needed (first load with overlapping equipment)
+    if (needsAutoLayout) {
+        console.log('Applying auto-layout to all inventories on first load...');
+        Object.keys(inventories).forEach(inventoryKey => {
+            if (inventories[inventoryKey] && inventories[inventoryKey].equipment && inventories[inventoryKey].equipment.length > 0) {
+                autoLayoutEquipment(inventories[inventoryKey].equipment);
+            }
+        });
+        saveInventories();
+        console.log('Auto-layout applied successfully');
+    }
+
     populateInventoryDropdowns();
 
     const inventorySelect = document.getElementById('inventorySelect');
@@ -5090,11 +5116,19 @@ function saveInventories() {
 function resetInventoriesToDefaults() {
     if (confirm('This will reset all inventories to default settings and remove any custom equipment. Continue?')) {
         inventories = deepClone(DEFAULT_INVENTORIES);
+
+        // Auto-layout all inventories to prevent overlapping equipment
+        Object.keys(inventories).forEach(inventoryKey => {
+            if (inventories[inventoryKey] && inventories[inventoryKey].equipment) {
+                autoLayoutEquipment(inventories[inventoryKey].equipment);
+            }
+        });
+
         saveInventories();
         populateInventoryDropdowns();
         renderMCR();
         updateEquipmentList();
-        showAlert('Inventories reset to defaults', 'success');
+        showAlert('Inventories reset to defaults with auto-layout applied', 'success');
     }
 }
 
