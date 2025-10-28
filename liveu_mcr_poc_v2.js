@@ -3006,6 +3006,10 @@ function redrawConnections() {
 
             // Only draw encoder-level connections if unit has explicit encoders
             if (hasExplicitEncoders) {
+                // Mark that we're using encoder-level connections for this unit
+                const unitConnectionKey = `${item.id}:unit-level`;
+                connectionSet.add(unitConnectionKey);
+
                 (item.encoders || []).forEach(encoder => {
                     // Only draw connections for encoders with status and channel
                     if (!encoder || !encoder.channel) return;
@@ -3029,6 +3033,10 @@ function redrawConnections() {
                 });
             } else if (item.status === 'streaming' && item.channel) {
                 // Fallback for units without explicit encoders (legacy behavior)
+                // Check if we already drew encoder-level connections
+                const unitConnectionKey = `${item.id}:unit-level`;
+                if (connectionSet.has(unitConnectionKey)) return;
+
                 const target = findStreamingTarget(item.channel, equipment);
                 if (target && target.equipment) {
                     addConnection(item.id, target.equipment.id, 'streaming', {
