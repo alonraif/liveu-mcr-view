@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiveU MCR Dashboard - Demo System</title>
+    <link rel="stylesheet" href="liveu_mcr_poc_v2.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <div class="nav-left">
+            <div class="logo">LiveU MCR</div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showPage('mcr', event)">MCR Dashboard</button>
+                <button class="nav-tab" onclick="showPage('inventory', event)">Inventory Manager</button>
+                <button class="nav-tab" onclick="showPage('script', event)">Script Manager</button>
+            </div>
+        </div>
+        <div class="inventory-selector">
+            <label for="inventorySelect">Inventory:</label>
+            <select id="inventorySelect" class="inventory-dropdown" onchange="selectInventory()">
+                <option value="">Select Inventory...</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Page Container -->
+    <div class="page-container">
+        <!-- MCR Dashboard Page -->
+        <div id="mcrPage" class="page active">
+            <div class="mcr-header">
+                <h1 class="mcr-title">Master Control Room</h1>
+                <div class="status-bar">
+                    <div class="status-item">
+                        <div class="status-dot online"></div>
+                        <span id="onlineCount">0 Online</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot streaming"></div>
+                        <span id="streamingCount">0 Streaming Encoders</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot offline"></div>
+                        <span id="offlineCount">0 Offline</span>
+                    </div>
+                    <div class="status-item">
+                        <span id="clockTime">00:00:00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mcr-container" id="mcrContainer">
+                <div class="no-equipment" id="noEquipment">
+                    Please select an inventory to view equipment
+                </div>
+            </div>
+
+            <div class="stats-panel">
+                <div class="stat-item" data-icon="🛰️">
+                    <span class="stat-label">Total Equipment:</span>
+                    <span class="stat-value" id="totalEquipment">0</span>
+                </div>
+                <div class="stat-item" data-icon="🎬">
+                    <span class="stat-label">Active Streams:</span>
+                    <span class="stat-value" id="activeStreams">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Manager Page -->
+        <div id="inventoryPage" class="page">
+            <div class="management-page">
+                <h1 class="page-title">Inventory Manager</h1>
+                
+                <div class="section">
+                    <h2 class="section-title" id="equipmentFormTitle">Add New Equipment</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Equipment Name</label>
+                            <input type="text" id="equipmentName" class="form-input" placeholder="e.g., CS-Lab-LU800-001">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Product Type</label>
+                            <select id="equipmentType" class="form-select" onchange="updateEquipmentForm()">
+                                <optgroup label="Units">
+                                    <option value="LU800-Pro">LU800-Pro (4 encoders)</option>
+                                    <option value="LU800-HDR">LU800-HDR</option>
+                                    <option value="LU600">LU600</option>
+                                    <option value="LU610">LU610</option>
+                                </optgroup>
+                                <optgroup label="Servers">
+                                    <option value="LU2000">LU2000 (4 channels)</option>
+                                    <option value="LU4000">LU4000 (4 channels)</option>
+                                    <option value="Ingest">Ingest Server</option>
+                                    <option value="SRT-In">SRT-In</option>
+                                    <option value="Cloud-MMH">Cloud MMH</option>
+                                </optgroup>
+                                <optgroup label="Transceivers">
+                                    <option value="Transceiver">Transceiver</option>
+                                </optgroup>
+                                <optgroup label="Destinations">
+                                    <option value="SDI">SDI Output</option>
+                                    <option value="NDI">NDI Output</option>
+                                    <option value="SRT">SRT Stream</option>
+                                    <option value="RTMP">RTMP Stream</option>
+                                    <option value="RTSP">RTSP Stream</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group" id="transceiverConfig" style="display: none;">
+                            <label class="form-label">Transceiver Config</label>
+                            <select id="transceiverMode" class="form-select">
+                                <option value="4e0d">4 Encoders, 0 Decoders</option>
+                                <option value="3e1d">3 Encoders, 1 Decoder</option>
+                                <option value="2e2d">2 Encoders, 2 Decoders</option>
+                                <option value="1e3d">1 Encoder, 3 Decoders</option>
+                                <option value="0e4d">0 Encoders, 4 Decoders</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="destinationEncoderGroup" style="display: none;">
+                            <label class="form-label">Connect To Encoder</label>
+                            <select id="destinationEncoder" class="form-select">
+                                <option value="">Select Encoder...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Initial Status</label>
+                            <select id="equipmentStatus" class="form-select">
+                                <option value="online">Online</option>
+                                <option value="offline">Offline</option>
+                                <option value="streaming">Streaming</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Inventory</label>
+                            <select id="equipmentInventory" class="form-select" onchange="updateEquipmentForm()">
+                                <option value="">Select Inventory...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn" id="equipmentSubmitBtn" onclick="submitEquipmentForm()">Add Equipment</button>
+                        <button class="btn btn-secondary" id="equipmentCancelBtn" onclick="cancelEditEquipment()" style="display: none;">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">Current Equipment</h2>
+                    <div id="equipmentList" class="equipment-list">
+                        <!-- Equipment cards will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Script Manager Page -->
+        <div id="scriptPage" class="page">
+            <div class="management-page">
+                <h1 class="page-title">Script Manager</h1>
+                
+                <div class="section">
+                    <h2 class="section-title">Pre-configured Demo Scripts</h2>
+                    <div class="script-presets">
+                        <div class="preset-grid">
+                            <div class="preset-card" onclick="loadPresetScript('newsbreak')">
+                                <div class="preset-title">📺 Breaking News</div>
+                                <div class="preset-description">Field unit goes live with breaking news coverage</div>
+                                <div class="preset-duration">Duration: 2 minutes</div>
+                            </div>
+                            <div class="preset-card" onclick="loadPresetScript('sportscast')">
+                                <div class="preset-title">⚽ Live Sports Event</div>
+                                <div class="preset-description">Multi-camera sports production with backup systems</div>
+                                <div class="preset-duration">Duration: 3 minutes</div>
+                            </div>
+                            <div class="preset-card" onclick="loadPresetScript('interview')">
+                                <div class="preset-title">🎤 Studio Interview</div>
+                                <div class="preset-description">Studio setup with multiple cameras and guest feed</div>
+                                <div class="preset-duration">Duration: 2.5 minutes</div>
+                            </div>
+                            <div class="preset-card" onclick="loadPresetScript('disaster')">
+                                <div class="preset-title">🚨 Emergency Response</div>
+                                <div class="preset-description">Equipment failures and failover scenarios</div>
+                                <div class="preset-duration">Duration: 4 minutes</div>
+                            </div>
+                            <div class="preset-card" onclick="loadPresetScript('election')">
+                                <div class="preset-title">🗳️ Election Night</div>
+                                <div class="preset-description">Multiple field locations going live sequentially</div>
+                                <div class="preset-duration">Duration: 5 minutes</div>
+                            </div>
+                            <div class="preset-card" onclick="loadPresetScript('morning')">
+                                <div class="preset-title">🌅 Morning Show</div>
+                                <div class="preset-description">Studio startup sequence with remote segments</div>
+                                <div class="preset-duration">Duration: 3.5 minutes</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">Demo Script Controls</h2>
+                    <div class="script-controls">
+                        <button class="btn btn-success" onclick="startScript()">Start Script</button>
+                        <button class="btn btn-danger" onclick="stopScript()">Stop Script</button>
+                        <button class="btn" onclick="resetScript()">Reset Script</button>
+                        <button class="btn" onclick="clearScript()">Clear All Events</button>
+                        <div class="time-display" id="scriptTime">00:00</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">Add Script Event</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Time (seconds)</label>
+                            <input type="number" id="eventTime" class="form-input" placeholder="e.g., 30">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Equipment</label>
+                            <select id="eventEquipment" class="form-select" onchange="updateActionOptions()">
+                                <option value="">Select Equipment...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Action</label>
+                            <select id="eventAction" class="form-select" onchange="toggleDestinationField()">
+                                <option value="online">Go Online</option>
+                                <option value="offline">Go Offline</option>
+                                <option value="streaming">Start Streaming</option>
+                                <option value="stop-streaming">Stop Streaming</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="destinationGroup" style="display: none;">
+                            <label class="form-label">Streaming Destination</label>
+                            <select id="eventDestination" class="form-select">
+                                <option value="">Select Destination...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <input type="text" id="eventDescription" class="form-input" placeholder="Event description (auto-generated if empty)">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="addScriptEvent()">Add Event</button>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">Script Timeline</h2>
+                    <div id="scriptTimeline" class="script-timeline">
+                        <!-- Timeline events will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert" id="alertBox">System ready</div>
+
+    <script src="liveu_mcr_poc_v2.js"></script>
+
+</body>
+</html>
