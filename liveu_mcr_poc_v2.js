@@ -911,7 +911,7 @@ const DEFAULT_INVENTORIES = {
 const DEFAULT_SCRIPT_EVENTS = [];
 
 let scriptEventIdCounter = Date.now();
-const ZOOM_CONFIG = { min: 0.35, max: 2.5, step: 0.15 };
+const ZOOM_CONFIG = { min: 0.35, max: 2.5, step: 0.08 };
 let mcrTransform = { scale: 1, translateX: 0, translateY: 0 };
 let userAdjustedZoom = false;
 let isPanningCanvas = false;
@@ -2566,6 +2566,8 @@ function startCanvasPan(e) {
         translateX: mcrTransform.translateX,
         translateY: mcrTransform.translateY
     };
+    // Disable transition during panning for instant feedback
+    canvas.classList.add('no-transition');
     document.body.classList.add('canvas-panning');
     document.addEventListener('mousemove', panCanvas);
     document.addEventListener('mouseup', endCanvasPan);
@@ -2584,6 +2586,11 @@ function panCanvas(e) {
 function endCanvasPan() {
     if (!isPanningCanvas) return;
     isPanningCanvas = false;
+    const canvas = document.getElementById('mcrCanvas');
+    // Re-enable transition after panning ends
+    if (canvas) {
+        canvas.classList.remove('no-transition');
+    }
     document.body.classList.remove('canvas-panning');
     document.removeEventListener('mousemove', panCanvas);
     document.removeEventListener('mouseup', endCanvasPan);
