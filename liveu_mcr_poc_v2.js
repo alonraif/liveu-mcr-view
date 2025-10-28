@@ -980,6 +980,8 @@ let draggedElement = null;
 let dragOffset = { x: 0, y: 0 };
 let connectionRedrawScheduled = false;
 let editingEquipment = null;
+let zoomAnimationFrameId = null;
+let isZoomTransitioning = false;
 
 // Pre-configured demo scripts
 const PRESET_SCRIPTS = {
@@ -1474,21 +1476,50 @@ function updateCanvasTransform(options = {}) {
     canvas.style.transform = `translate(${mcrTransform.translateX}px, ${mcrTransform.translateY}px) scale(${mcrTransform.scale})`;
 
     // If transition is disabled (no-transition class), redraw immediately
-    // Otherwise, wait for transition to complete
+    // Otherwise, continuously redraw during the transition
     if (canvas.classList.contains('no-transition')) {
         scheduleConnectionRedraw();
     } else {
-        // Wait for transition to complete before redrawing connections
+        // Start continuous redraw loop during zoom transition
+        startZoomTransition();
+        // Also listen for transition end to clean up
         canvas.addEventListener('transitionend', onCanvasTransitionEnd, { once: true });
-        // Also schedule a fallback redraw in case transitionend doesn't fire
-        setTimeout(() => scheduleConnectionRedraw(), 350);
     }
 }
 
+function startZoomTransition() {
+    // Cancel any existing animation loop
+    if (zoomAnimationFrameId) {
+        cancelAnimationFrame(zoomAnimationFrameId);
+    }
+
+    isZoomTransitioning = true;
+
+    // Continuous redraw loop during zoom
+    function updateDuringZoom() {
+        if (isZoomTransitioning) {
+            redrawConnections();
+            zoomAnimationFrameId = requestAnimationFrame(updateDuringZoom);
+        }
+    }
+
+    updateDuringZoom();
+}
+
+function stopZoomTransition() {
+    isZoomTransitioning = false;
+    if (zoomAnimationFrameId) {
+        cancelAnimationFrame(zoomAnimationFrameId);
+        zoomAnimationFrameId = null;
+    }
+    // One final redraw to ensure accuracy
+    scheduleConnectionRedraw();
+}
+
 function onCanvasTransitionEnd(e) {
-    // Only redraw if the transform property completed
+    // Only stop when the transform property completes
     if (e.propertyName === 'transform') {
-        scheduleConnectionRedraw();
+        stopZoomTransition();
     }
 }
 
