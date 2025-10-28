@@ -3084,12 +3084,21 @@ function redrawConnections() {
                 if (channelTarget && channelTarget.equipment && channelTarget.equipment.id !== item.id) {
                     console.log(`[SERVER DOWNSTREAM] Server ${item.name} channel ${channel.id} resolved target: ${channelTarget.equipment.name} (${channelTarget.equipment.type}) via ${channelTarget.via}`);
 
+                    // IMPORTANT: Only draw server→downstream if target is actually downstream (destination, ingest, srt-in)
+                    // Do NOT draw if target is a unit (encoder) - that's an upstream connection already handled by unit processing
+                    const isActuallyDownstream = channelTarget.equipment.type === 'destination' ||
+                                                 channelTarget.equipment.type === 'ingest' ||
+                                                 channelTarget.equipment.type === 'srt-in';
+
                     const connectionType = channel.status === 'streaming' ? 'streaming' : channel.status === 'connected' ? 'idle' : null;
-                    if (connectionType) {
+                    if (connectionType && isActuallyDownstream) {
+                        console.log(`[SERVER→DESTINATION] Drawing downstream connection: ${item.name} channel ${channel.id} → ${channelTarget.equipment.name}`);
                         addConnection(item.id, channelTarget.equipment.id, connectionType, {
                             fromSelector: buildChannelSelector(channel.id, 'output'),
                             toSelector: getMatchSelector(channelTarget, 'input')
                         });
+                    } else if (connectionType && !isActuallyDownstream) {
+                        console.log(`[SERVER DOWNSTREAM SKIP] Skipping upstream target ${channelTarget.equipment.name} (${channelTarget.equipment.type}) - already handled by unit processing`);
                     }
                 }
             });
