@@ -2959,16 +2959,28 @@ function scheduleConnectionRedraw() {
 }
 
 function redrawConnections() {
+    console.log('[REDRAW CONNECTIONS] Starting redraw...', { showConnections, currentInventory });
+
     document.querySelectorAll('.connection-line').forEach(line => {
         line.parentElement.remove();
     });
 
-    if (!showConnections || !currentInventory || !inventories[currentInventory]) return;
+    if (!showConnections || !currentInventory || !inventories[currentInventory]) {
+        console.log('[REDRAW CONNECTIONS] Exiting early - connections disabled or no inventory');
+        return;
+    }
 
     const equipment = inventories[currentInventory].equipment;
     const container = document.getElementById('mcrContainer');
     const canvas = document.getElementById('mcrCanvas');
-    if (!container || !canvas || !equipment) return;
+    if (!container || !canvas || !equipment) {
+        console.log('[REDRAW CONNECTIONS] Missing container, canvas, or equipment');
+        return;
+    }
+
+    console.log(`[REDRAW CONNECTIONS] Processing ${equipment.length} equipment items:`,
+        equipment.map(e => `${e.name} (${e.type})`)
+    );
 
     const containerRect = container.getBoundingClientRect();
     const canvasRect = canvas.getBoundingClientRect();
@@ -3148,6 +3160,8 @@ function redrawConnections() {
             }
         }
     });
+
+    console.log(`[REDRAW CONNECTIONS] Completed. Processed ${equipment.length} equipment items. Total connections in set: ${connectionSet.size}`);
 }
 
 function findStreamingTarget(channelName, equipment) {
