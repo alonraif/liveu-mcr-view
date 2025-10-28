@@ -3072,20 +3072,10 @@ function redrawConnections() {
             (item.channels || []).forEach(channel => {
                 if (!channel) return;
 
-                if (channel.connectedUnit) {
-                    const unit = equipment.find(eq => eq.id === channel.connectedUnit);
-                    if (unit && unit.id !== item.id) {
-                        const connectionType = channel.status === 'streaming' ? 'streaming' : channel.status === 'connected' ? 'idle' : null;
-                        if (connectionType) {
-                            console.log(`[SERVER→UNIT REVERSE] Server ${item.name} channel ${channel.id} trying to draw connection from unit ${unit.name}`);
-
-                            addConnection(unit.id, item.id, connectionType, {
-                                fromSelector: findStreamingEncoderSelector(unit, channel.id),
-                                toSelector: buildChannelSelector(channel.id, 'input')
-                            });
-                        }
-                    }
-                }
+                // REMOVED: This was creating duplicate connections because unit processing
+                // already draws unit→server connections. The server doesn't need to draw
+                // the reverse connection since we handle it from the unit side.
+                // Lines 3075-3088 commented out to fix duplicate encoder connections.
 
                 const channelTarget = resolveChannelTarget(channel.id, equipment, {
                     excludeIds: [item.id],
