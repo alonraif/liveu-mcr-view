@@ -1438,6 +1438,33 @@ function autoLayoutEquipment(equipment) {
     return equipment;
 }
 
+// Update specific equipment nodes without full re-render
+function updateEquipmentNodes(equipmentIds) {
+    const canvas = document.getElementById('mcrCanvas');
+    if (!canvas || !currentInventory) return;
+
+    const equipment = inventories[currentInventory].equipment;
+
+    equipmentIds.forEach(equipmentId => {
+        const item = equipment.find(eq => eq.id === equipmentId);
+        if (!item) return;
+
+        // Find the existing node
+        const existingNode = canvas.querySelector(`[data-id="${equipmentId}"]`);
+        if (!existingNode) return;
+
+        // Create updated node
+        const updatedNode = createEquipmentNode(item);
+
+        // Preserve position
+        updatedNode.style.left = existingNode.style.left;
+        updatedNode.style.top = existingNode.style.top;
+
+        // Replace old node with updated one
+        existingNode.replaceWith(updatedNode);
+    });
+}
+
 // MCR Rendering
 function renderMCR() {
     const container = document.getElementById('mcrContainer');
@@ -4838,13 +4865,22 @@ function executeScriptEvent(event) {
     }
     enforceChannelStreamingConsistency();
     saveInventories();
-    
-    // Refresh MCR if this inventory is currently displayed
-    if (currentInventory === event.inventoryKey || 
+
+    // Update only affected equipment nodes without full re-render
+    if (currentInventory === event.inventoryKey ||
         (event.destination && currentInventory === event.destination.inventoryKey)) {
-        renderMCR();
+        updateEquipmentNodes([equipment.id]);
+
+        // Also update destination equipment if it exists
+        if (event.destination && event.destination.equipmentId) {
+            updateEquipmentNodes([event.destination.equipmentId]);
+        }
+
+        // Redraw connections to reflect new state
+        scheduleConnectionRedraw();
+        updateStats();
     }
-    
+
     if (normalizedDestination) {
         saveScriptEvents();
     }
