@@ -105,7 +105,27 @@ const DEFAULT_INVENTORIES = {
                     { id: 1, status: 'streaming', channel: 'Channel-1' }
                 ],
                 bandwidth: { current: 4500, max: 5000 },
-                alerts: []
+                alerts: [],
+                // HACKATHON ENHANCEMENTS
+                onAir: true,
+                story: {
+                    slugline: 'Breaking News - City Hall',
+                    crew: 'John Reporter',
+                    id: 'story-12345'
+                },
+                battery: {
+                    percentage: 86,
+                    remainingMinutes: 263,
+                    charging: false
+                },
+                delay: 2500,
+                videoReturn: true,
+                location: 'Central Park, Manhattan',
+                links: [
+                    { name: 'AT&T 5G', signal: 4, bandwidth: 2500, technology: '5G', connected: true },
+                    { name: 'Verizon LTE', signal: 5, bandwidth: 3100, technology: 'LTE', connected: true },
+                    { name: 'ETH0', signal: 5, bandwidth: 5000, connected: true, type: 'ethernet' }
+                ]
             },
             {
                 id: 'fo-lu610-001',
@@ -121,7 +141,21 @@ const DEFAULT_INVENTORIES = {
                     { id: 1, status: 'offline', channel: null }
                 ],
                 bandwidth: { current: 0, max: 6000 },
-                alerts: []
+                alerts: [],
+                // HACKATHON ENHANCEMENTS
+                onAir: false,
+                battery: {
+                    percentage: 100,
+                    remainingMinutes: 360,
+                    charging: true
+                },
+                delay: 2500,
+                videoReturn: false,
+                location: 'News Van (parked)',
+                links: [
+                    { name: 'T-Mobile 5G', signal: 5, bandwidth: 0, technology: '5G', connected: false },
+                    { name: 'WiFi', signal: 0, bandwidth: 0, connected: false, type: 'wifi' }
+                ]
             },
             {
                 id: 'fo-lu4000-001',
@@ -288,11 +322,114 @@ const PRESET_SCRIPTS = {
         events: [
             { time: 5, equipment: "fo-lu4000-001", action: "online", description: "Field server comes online" },
             { time: 10, equipment: "fo-lu600-001", action: "online", description: "Field reporter unit ready" },
-            { time: 15, equipment: "fo-lu600-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-1", description: "BREAKING: Reporter goes live from scene" },
-            { time: 45, equipment: "fo-lu610-001", action: "online", description: "Backup unit online" },
+            { time: 15, equipment: "fo-lu600-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-1", description: "🔴 BREAKING: Reporter goes live from scene" },
+            { time: 20, equipment: "fo-lu600-001", action: "set-battery", value: 72, description: "Battery draining during live transmission" },
+            { time: 35, equipment: "fo-lu600-001", action: "degrade-link", linkIndex: 1, signal: 3, description: "⚠️ Verizon LTE signal degrading" },
+            { time: 45, equipment: "fo-lu610-001", action: "online", description: "Backup unit online as precaution" },
+            { time: 50, equipment: "fo-lu600-001", action: "set-battery", value: 45, description: "⚠️ Battery at 45% - Low battery warning" },
+            { time: 60, equipment: "fo-lu600-001", action: "degrade-link", linkIndex: 1, signal: 2, description: "🔴 Critical: Verizon signal critical" },
+            { time: 70, equipment: "fo-lu600-001", action: "restore-link", linkIndex: 1, signal: 5, description: "✅ Signal restored" },
             { time: 90, equipment: "fo-lu600-001", action: "stop-streaming", description: "End of live report" },
             { time: 100, equipment: "fo-lu610-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-2", description: "Backup unit takes over for follow-up" },
             { time: 120, equipment: "fo-lu610-001", action: "stop-streaming", description: "Coverage complete" }
+        ]
+    },
+    sportscast: {
+        name: "Live Sports Event",
+        inventory: "field-ops",
+        events: [
+            { time: 5, equipment: "fo-lu4000-001", action: "online", description: "Stadium server online" },
+            { time: 10, equipment: "fo-lu800pro-001", action: "online", description: "Main camera unit ready" },
+            { time: 15, equipment: "fo-lu800pro-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-1", description: "🎬 Main camera feed starts" },
+            { time: 25, equipment: "fo-lu610-001", action: "online", description: "Handheld camera ready" },
+            { time: 30, equipment: "fo-lu610-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-2", description: "Handheld camera joins broadcast" },
+            { time: 45, equipment: "fo-lu800pro-001", action: "degrade-link", linkIndex: 0, signal: 3, description: "⚠️ Crowd interference - AT&T signal drops" },
+            { time: 50, equipment: "fo-lu800pro-001", action: "set-battery", value: 68, description: "Battery draining on main camera" },
+            { time: 75, equipment: "fo-lu800pro-001", action: "restore-link", linkIndex: 0, signal: 5, description: "✅ AT&T signal restored" },
+            { time: 90, equipment: "fo-lu800pro-001", action: "set-battery", value: 35, description: "⚠️ Main camera battery at 35%" },
+            { time: 100, equipment: "fo-lu600-001", action: "online", description: "Backup camera online" },
+            { time: 120, equipment: "fo-lu800pro-001", action: "stop-streaming", description: "Main camera wraps" },
+            { time: 130, equipment: "fo-lu610-001", action: "stop-streaming", description: "All feeds stopped" }
+        ]
+    },
+    interview: {
+        name: "Studio Interview",
+        inventory: "studio-production",
+        events: [
+            { time: 5, equipment: "st-lu2000-001", action: "online", description: "Studio server online" },
+            { time: 10, equipment: "st-lu800pro-001", action: "online", description: "Camera 1 ready" },
+            { time: 15, equipment: "st-lu800pro-002", action: "online", description: "Camera 2 ready" },
+            { time: 20, equipment: "st-lu800pro-001", action: "streaming", destination: "studio-production:st-lu2000-001:channel:Studio-A", description: "🎥 Camera 1 streaming" },
+            { time: 25, equipment: "st-lu800pro-002", action: "streaming", destination: "studio-production:st-lu2000-001:channel:Studio-B", description: "🎥 Camera 2 streaming" },
+            { time: 40, equipment: "st-sdi-output-001", action: "online", description: "SDI output to control room" },
+            { time: 60, equipment: "st-lu800pro-001", action: "set-battery", value: 55, description: "Camera 1 battery check" },
+            { time: 90, equipment: "st-lu800pro-002", action: "set-battery", value: 48, description: "Camera 2 battery check" },
+            { time: 120, equipment: "st-lu800pro-001", action: "stop-streaming", description: "Camera 1 wrap" },
+            { time: 125, equipment: "st-lu800pro-002", action: "stop-streaming", description: "Interview complete" }
+        ]
+    },
+    disaster: {
+        name: "Emergency Response",
+        inventory: "field-ops",
+        events: [
+            { time: 5, equipment: "fo-lu4000-001", action: "online", description: "Command server online" },
+            { time: 10, equipment: "fo-lu600-001", action: "online", description: "Primary unit on scene" },
+            { time: 15, equipment: "fo-lu600-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-1", description: "🔴 LIVE from disaster scene" },
+            { time: 25, equipment: "fo-lu600-001", action: "degrade-link", linkIndex: 0, signal: 2, description: "🚨 CRITICAL: AT&T tower damaged" },
+            { time: 30, equipment: "fo-lu600-001", action: "degrade-link", linkIndex: 1, signal: 3, description: "⚠️ Verizon signal degrading" },
+            { time: 35, equipment: "fo-lu600-001", action: "set-battery", value: 38, description: "🔋 Battery draining rapidly" },
+            { time: 40, equipment: "fo-lu610-001", action: "online", description: "⚡ Backup unit deploying" },
+            { time: 45, equipment: "fo-lu610-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-2", description: "Backup feed established" },
+            { time: 50, equipment: "fo-lu600-001", action: "set-battery", value: 18, description: "🔴 CRITICAL BATTERY - 18% remaining" },
+            { time: 55, equipment: "fo-lu600-001", action: "offline", description: "⚠️ Primary unit battery depleted" },
+            { time: 60, equipment: "fo-lu610-001", action: "set-battery", value: 85, description: "Backup unit continuing coverage" },
+            { time: 90, equipment: "fo-lu800pro-001", action: "online", description: "Additional camera arrives" },
+            { time: 100, equipment: "fo-lu800pro-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-3", description: "Multi-angle coverage active" },
+            { time: 120, equipment: "fo-lu600-001", action: "online", description: "✅ Primary unit recharged, back online" },
+            { time: 150, equipment: "fo-lu610-001", action: "stop-streaming", description: "Backup feed released" },
+            { time: 160, equipment: "fo-lu800pro-001", action: "stop-streaming", description: "Additional camera wrap" },
+            { time: 180, equipment: "fo-lu600-001", action: "stop-streaming", description: "Emergency coverage complete" }
+        ]
+    },
+    election: {
+        name: "Election Night Coverage",
+        inventory: "field-ops",
+        events: [
+            { time: 5, equipment: "fo-lu4000-001", action: "online", description: "Election HQ server ready" },
+            { time: 10, equipment: "fo-lu600-001", action: "online", description: "Location 1: Campaign HQ" },
+            { time: 15, equipment: "fo-lu600-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-1", description: "🗳️ Campaign HQ goes live" },
+            { time: 30, equipment: "fo-lu610-001", action: "online", description: "Location 2: Polling station" },
+            { time: 35, equipment: "fo-lu610-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-2", description: "🗳️ Polling station live" },
+            { time: 50, equipment: "fo-lu800pro-001", action: "online", description: "Location 3: Victory party venue" },
+            { time: 55, equipment: "fo-lu800pro-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-3", description: "🗳️ Victory venue live" },
+            { time: 75, equipment: "fo-lu600-001", action: "set-battery", value: 52, description: "Campaign HQ battery check" },
+            { time: 90, equipment: "fo-lu610-001", action: "set-battery", value: 44, description: "Polling station battery check" },
+            { time: 110, equipment: "fo-lu800pro-001", action: "set-battery", value: 38, description: "⚠️ Victory venue battery low" },
+            { time: 130, equipment: "fo-lu600-001", action: "degrade-link", linkIndex: 0, signal: 3, description: "High network traffic - signal impact" },
+            { time: 150, equipment: "fo-lu600-001", action: "restore-link", linkIndex: 0, signal: 5, description: "✅ Signal restored" },
+            { time: 180, equipment: "fo-lu610-001", action: "stop-streaming", description: "Polling station wraps" },
+            { time: 200, equipment: "fo-lu600-001", action: "stop-streaming", description: "Campaign HQ wraps" },
+            { time: 220, equipment: "fo-lu800pro-001", action: "stop-streaming", description: "Election night coverage complete" }
+        ]
+    },
+    morning: {
+        name: "Morning Show Startup",
+        inventory: "studio-production",
+        events: [
+            { time: 5, equipment: "st-lu2000-001", action: "online", description: "Studio server powering up" },
+            { time: 10, equipment: "st-lu800pro-001", action: "online", description: "Studio Camera 1 ready" },
+            { time: 15, equipment: "st-lu800pro-002", action: "online", description: "Studio Camera 2 ready" },
+            { time: 20, equipment: "st-lu800pro-001", action: "streaming", destination: "studio-production:st-lu2000-001:channel:Studio-A", description: "🌅 Camera 1 live" },
+            { time: 25, equipment: "st-lu800pro-002", action: "streaming", destination: "studio-production:st-lu2000-001:channel:Studio-B", description: "🌅 Camera 2 live" },
+            { time: 40, equipment: "st-sdi-output-001", action: "online", description: "SDI output active" },
+            { time: 45, equipment: "st-ndi-output-001", action: "online", description: "NDI output active" },
+            { time: 60, equipment: "st-lu800pro-003", action: "online", description: "Remote segment unit ready" },
+            { time: 70, equipment: "st-lu800pro-003", action: "streaming", destination: "studio-production:st-lu2000-001:channel:Studio-C", description: "🎤 Remote segment begins" },
+            { time: 90, equipment: "st-lu800pro-003", action: "set-battery", value: 68, description: "Remote unit battery check" },
+            { time: 110, equipment: "st-lu800pro-003", action: "stop-streaming", description: "Remote segment ends" },
+            { time: 130, equipment: "st-lu800pro-001", action: "set-battery", value: 75, description: "Studio cameras still on mains power" },
+            { time: 150, equipment: "st-lu800pro-001", action: "stop-streaming", description: "Camera 1 wrap" },
+            { time: 155, equipment: "st-lu800pro-002", action: "stop-streaming", description: "Morning show complete" }
         ]
     },
     cloudproduction: {
@@ -302,8 +439,11 @@ const PRESET_SCRIPTS = {
             { time: 10, equipment: "cl-cloudmmh-001", action: "online", description: "Cloud server online" },
             { time: 15, equipment: "cl-lu800hdr-001", action: "online", description: "HDR unit ready" },
             { time: 20, equipment: "cl-lu800hdr-001", action: "streaming", destination: "cloud-setup:cl-cloudmmh-001:channel:Cloud-Channel-1", description: "🎥 HDR stream begins" },
+            { time: 40, equipment: "cl-lu800hdr-001", action: "set-battery", value: 82, description: "Battery nominal" },
             { time: 60, equipment: "cl-sdi-001", action: "online", description: "SDI output ready" },
+            { time: 70, equipment: "cl-lu800hdr-001", action: "set-battery", value: 65, description: "Battery draining normally" },
             { time: 90, equipment: "cl-ndi-001", action: "online", description: "NDI stream ready" },
+            { time: 100, equipment: "cl-lu800hdr-001", action: "set-battery", value: 48, description: "Battery below 50%" },
             { time: 120, equipment: "cl-lu800hdr-001", action: "stop-streaming", description: "Production complete" }
         ]
     }
@@ -809,11 +949,14 @@ function handleKeyDown(event) {
 
 function createEquipmentNode(equipment) {
     const node = document.createElement('div');
-    
+
     // Determine the correct status class based on LiveU logic
     let statusClass = determineEquipmentStatus(equipment);
-    
-    node.className = `equipment-node ${statusClass} ${equipment.type}`;
+
+    // HACKATHON ENHANCEMENT: Add on-air class
+    const onAirClass = equipment.onAir ? 'on-air' : '';
+
+    node.className = `equipment-node ${statusClass} ${equipment.type} ${onAirClass}`;
     node.dataset.x = equipment.x ?? 0;
     node.dataset.y = equipment.y ?? 0;
     node.style.left = '0px';
@@ -827,12 +970,31 @@ function createEquipmentNode(equipment) {
 
     // Add drag functionality
     node.addEventListener('mousedown', startDrag);
+
+    // HACKATHON ENHANCEMENT: Add click handlers for interactive elements
     node.addEventListener('click', (e) => {
+        // Toggle links section
+        if (e.target.closest('.links-header')) {
+            const linksSection = e.target.closest('.links-section');
+            if (linksSection) {
+                linksSection.classList.toggle('expanded');
+            }
+            e.stopPropagation();
+            return;
+        }
+
+        // Show equipment detail modal on double-click
         if (!draggedElement) {
             selectEquipment(equipment);
         }
     });
-    
+
+    // Add double-click for detail modal
+    node.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        showEquipmentDetail(equipment);
+    });
+
     return node;
 }
 
@@ -936,6 +1098,69 @@ function createEquipmentHTML(equipment, statusClass) {
 }
 
 function createUnitHTML(equipment, statusClass) {
+    // ON-AIR Banner
+    const onAirBanner = equipment.onAir ? '<div class="on-air-banner">🔴 LIVE</div>' : '';
+
+    // Story Badge
+    const storyBadge = equipment.story ? `
+        <div class="story-badge">
+            <div class="story-title">📋 ${equipment.story.slugline}</div>
+            <div class="crew-name">👤 ${equipment.story.crew}</div>
+        </div>
+    ` : '';
+
+    // Battery Indicator
+    let batteryHTML = '';
+    if (equipment.battery) {
+        const batteryIcon = equipment.battery.percentage > 80 ? '🔋' :
+                          equipment.battery.percentage > 50 ? '🔋' :
+                          equipment.battery.percentage > 20 ? '🪫' : '🪫';
+        const chargingIcon = equipment.battery.charging ? ' ⚡' : '';
+        const batteryClass = equipment.battery.percentage < 20 ? 'battery-indicator critical' :
+                            equipment.battery.percentage < 50 ? 'battery-indicator low' : 'battery-indicator';
+        const hours = Math.floor(equipment.battery.remainingMinutes / 60);
+        const mins = equipment.battery.remainingMinutes % 60;
+
+        batteryHTML = `
+            <div class="${batteryClass}">
+                ${batteryIcon} ${equipment.battery.percentage}% (${hours}h ${mins}m)${chargingIcon}
+            </div>
+        `;
+    }
+
+    // Links Section (collapsible)
+    let linksHTML = '';
+    if (equipment.links && equipment.links.length > 0) {
+        const activeLinks = equipment.links.filter(l => l.connected).length;
+        const linksDetailHTML = equipment.links.map(link => {
+            const signalBars = '●'.repeat(link.signal) + '○'.repeat(5 - link.signal);
+            const signalClass = link.signal >= 4 ? 'signal-strength' :
+                              link.signal >= 2 ? 'signal-strength weak' : 'signal-strength critical';
+            const linkClass = link.signal === 0 ? 'link-item failed' :
+                            link.signal < 3 ? 'link-item degraded' : 'link-item';
+            const bwDisplay = link.connected ? `${(link.bandwidth / 1000).toFixed(1)} Mbps ↑` : 'Disconnected';
+
+            return `
+                <div class="${linkClass}">
+                    <span>📡 ${link.name}</span>
+                    <span class="${signalClass}">${signalBars}</span>
+                    <span>${bwDisplay}</span>
+                </div>
+            `;
+        }).join('');
+
+        linksHTML = `
+            <div class="links-section" data-equipment-id="${equipment.id}">
+                <div class="links-header">
+                    Links: ${activeLinks} active
+                </div>
+                <div class="links-detail">
+                    ${linksDetailHTML}
+                </div>
+            </div>
+        `;
+    }
+
     const encodersHTML = equipment.encoders?.map((encoder, idx) => `
         <div class="encoder-item ${encoder.status}" data-encoder-id="${escapeAttribute(encoder.id)}">
             <span>Encoder ${encoder.id}</span>
@@ -954,7 +1179,25 @@ function createUnitHTML(equipment, statusClass) {
         <div class="bandwidth-text">${equipment.bandwidth.current}/${equipment.bandwidth.max} Kbps</div>
     ` : '';
 
+    // Extras (delay, video return, location)
+    let extrasHTML = '';
+    const extras = [];
+    if (equipment.delay) {
+        extras.push(`<span class="delay-indicator">⏱️ ${(equipment.delay / 1000).toFixed(1)}s delay</span>`);
+    }
+    if (equipment.videoReturn) {
+        extras.push(`<span class="vr-indicator">↩️ VR Active</span>`);
+    }
+    if (equipment.location) {
+        extras.push(`<div class="location-badge">📍 ${equipment.location}</div>`);
+    }
+    if (extras.length > 0) {
+        extrasHTML = `<div class="node-extras">${extras.join('')}</div>`;
+    }
+
     return `
+        ${onAirBanner}
+        ${storyBadge}
         <div class="node-header">
             <div class="node-title">${equipment.name}</div>
             <div class="node-status ${statusClass}">${statusClass.toUpperCase()}</div>
@@ -967,6 +1210,9 @@ function createUnitHTML(equipment, statusClass) {
         </div>
         ${encodersHTML ? `<div class="encoders-container">${encodersHTML}</div>` : ''}
         ${bandwidthHTML}
+        ${batteryHTML}
+        ${extrasHTML}
+        ${linksHTML}
     `;
 }
 
@@ -3575,6 +3821,45 @@ function executeScriptEvent(event) {
                 }
             }
         }
+
+    // HACKATHON ENHANCEMENTS: New script actions
+    } else if (event.action === 'set-battery') {
+        // Update battery level
+        if (!equipment.battery) {
+            equipment.battery = { percentage: 100, remainingMinutes: 300, charging: false };
+        }
+        equipment.battery.percentage = event.value || 100;
+        // Estimate remaining minutes based on percentage (assume ~3 hours at 100%)
+        equipment.battery.remainingMinutes = Math.floor((event.value / 100) * 180);
+
+    } else if (event.action === 'degrade-link') {
+        // Degrade a specific link's signal quality
+        if (equipment.links && equipment.links[event.linkIndex]) {
+            equipment.links[event.linkIndex].signal = event.signal || 1;
+            if (event.signal <= 2) {
+                // Critical signal might reduce bandwidth
+                equipment.links[event.linkIndex].bandwidth = Math.floor(equipment.links[event.linkIndex].bandwidth * 0.4);
+            } else if (event.signal <= 3) {
+                equipment.links[event.linkIndex].bandwidth = Math.floor(equipment.links[event.linkIndex].bandwidth * 0.7);
+            }
+        }
+
+    } else if (event.action === 'restore-link') {
+        // Restore a link's signal quality
+        if (equipment.links && equipment.links[event.linkIndex]) {
+            equipment.links[event.linkIndex].signal = event.signal || 5;
+            // Restore to original bandwidth (stored in data or use reasonable default)
+            const linkType = equipment.links[event.linkIndex].technology;
+            if (linkType === '5G') {
+                equipment.links[event.linkIndex].bandwidth = 2500;
+            } else if (linkType === 'LTE') {
+                equipment.links[event.linkIndex].bandwidth = 3100;
+            } else if (equipment.links[event.linkIndex].type === 'ethernet') {
+                equipment.links[event.linkIndex].bandwidth = 5000;
+            } else {
+                equipment.links[event.linkIndex].bandwidth = 2000; // Default
+            }
+        }
     }
     enforceChannelStreamingConsistency();
     saveInventories();
@@ -3863,8 +4148,145 @@ function showAlert(message, type = 'info') {
     alert.textContent = message;
     alert.className = `alert ${type}`;
     alert.classList.add('show');
-    
+
     setTimeout(() => {
         alert.classList.remove('show');
     }, 4000);
+}
+
+// ========================================
+// HACKATHON ENHANCEMENTS
+// ========================================
+
+// Equipment Detail Modal
+function showEquipmentDetail(equipment) {
+    // Remove any existing modal
+    const existingModal = document.querySelector('.equipment-detail-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'equipment-detail-modal';
+
+    // Format battery info
+    let batteryHTML = '';
+    if (equipment.battery) {
+        const hours = Math.floor(equipment.battery.remainingMinutes / 60);
+        const mins = equipment.battery.remainingMinutes % 60;
+        batteryHTML = `
+            <div class="detail-item">
+                <label>Battery:</label>
+                <value>🔋 ${equipment.battery.percentage}% (${hours}h ${mins}m)${equipment.battery.charging ? ' ⚡ Charging' : ''}</value>
+            </div>
+        `;
+    }
+
+    // Format story info
+    let storyHTML = '';
+    if (equipment.story) {
+        storyHTML = `
+            <div class="detail-item">
+                <label>Story:</label>
+                <value>📋 ${equipment.story.slugline}</value>
+            </div>
+            <div class="detail-item">
+                <label>Crew:</label>
+                <value>👤 ${equipment.story.crew}</value>
+            </div>
+        `;
+    }
+
+    // Format links info
+    let linksHTML = '';
+    if (equipment.links && equipment.links.length > 0) {
+        const linksDetail = equipment.links.map(link => {
+            const signalBars = '●'.repeat(link.signal) + '○'.repeat(5 - link.signal);
+            const bwDisplay = link.connected ? `${(link.bandwidth / 1000).toFixed(1)} Mbps` : 'Disconnected';
+            return `${link.name}: ${signalBars} ${bwDisplay}`;
+        }).join('<br>');
+
+        linksHTML = `
+            <div class="detail-item" style="grid-column: 1 / -1;">
+                <label>Network Links:</label>
+                <value style="line-height: 1.8;">${linksDetail}</value>
+            </div>
+        `;
+    }
+
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>${equipment.name}</h2>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Product:</label>
+                    <value>${equipment.product}</value>
+                </div>
+                <div class="detail-item">
+                    <label>Status:</label>
+                    <value class="status-${equipment.status}">${equipment.status.toUpperCase()}</value>
+                </div>
+                <div class="detail-item">
+                    <label>Mode:</label>
+                    <value>📹 ${equipment.mode || 'N/A'}</value>
+                </div>
+                <div class="detail-item">
+                    <label>Uptime:</label>
+                    <value>⏱️ ${equipment.uptime || 'N/A'}</value>
+                </div>
+                ${equipment.onAir ? `
+                    <div class="detail-item">
+                        <label>On-Air:</label>
+                        <value style="color: #ff0000; font-weight: 700;">🔴 LIVE</value>
+                    </div>
+                ` : ''}
+                ${equipment.delay ? `
+                    <div class="detail-item">
+                        <label>Delay:</label>
+                        <value>⏱️ ${(equipment.delay / 1000).toFixed(1)}s</value>
+                    </div>
+                ` : ''}
+                ${equipment.videoReturn ? `
+                    <div class="detail-item">
+                        <label>Video Return:</label>
+                        <value>↩️ Active</value>
+                    </div>
+                ` : ''}
+                ${equipment.location ? `
+                    <div class="detail-item">
+                        <label>Location:</label>
+                        <value>📍 ${equipment.location}</value>
+                    </div>
+                ` : ''}
+                ${batteryHTML}
+                ${storyHTML}
+                ${equipment.bandwidth ? `
+                    <div class="detail-item">
+                        <label>Bandwidth:</label>
+                        <value>📊 ${equipment.bandwidth.current} / ${equipment.bandwidth.max} Kbps</value>
+                    </div>
+                ` : ''}
+                ${linksHTML}
+            </div>
+            <button class="modal-close-btn" onclick="this.closest('.equipment-detail-modal').remove()">Close</button>
+        </div>
+    `;
+
+    // Close modal on background click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+
+    // Close modal on ESC key
+    const escapeHandler = (e) => {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', escapeHandler);
+        }
+    };
+    document.addEventListener('keydown', escapeHandler);
+
+    document.body.appendChild(modal);
 }
