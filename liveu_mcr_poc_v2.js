@@ -3016,10 +3016,19 @@ function redrawConnections() {
 
             (item.encoders || []).forEach(encoder => {
                 if (!encoder || !encoder.channel) return;
+
+                // Find the primary target for this encoder
                 const target = resolveChannelTarget(encoder.channel, equipment, { preferDownstream: true });
                 if (!target || !target.equipment || target.equipment.id === item.id) return;
+
                 const connectionType = encoder.status === 'streaming' ? 'streaming' : encoder.status === 'connected' ? 'idle' : null;
                 if (!connectionType) return;
+
+                // Build the encoder-specific connection key to ensure one encoder = one connection
+                const encoderKey = `${item.id}:encoder-${encoder.id}`;
+                if (connectionSet.has(encoderKey)) return; // This encoder already has a connection
+                connectionSet.add(encoderKey);
+
                 addConnection(item.id, target.equipment.id, connectionType, {
                     fromSelector: buildEncoderSelector(encoder.id, 'output'),
                     toSelector: getMatchSelector(target, 'input')
