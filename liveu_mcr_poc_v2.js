@@ -1,5 +1,5 @@
 // Version tracking for cache busting
-const APP_VERSION = '20250128-003';
+const APP_VERSION = '20250128-004';
 console.log(`%c🚀 LiveU MCR Dashboard v${APP_VERSION}`, 'color: #4CAF50; font-weight: bold; font-size: 14px;');
 
 const STORAGE_KEYS = {
@@ -2889,6 +2889,7 @@ function createConnectionLine(fromId, toId, options = {}) {
     svg.setAttribute('viewBox', `0 0 ${canvasRect.width} ${canvasRect.height}`);
     svg.setAttribute('preserveAspectRatio', 'none');
 
+    // Create the main path
     const pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     pathElement.setAttribute('d', path);
     pathElement.setAttribute('class', 'connection-line animated');
@@ -2896,7 +2897,19 @@ function createConnectionLine(fromId, toId, options = {}) {
         pathElement.classList.add(options.type);
     }
 
-    svg.appendChild(pathElement);
+    // Add a white "casing" underneath for the jump effect
+    // This creates a small gap when lines cross
+    const casingPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    casingPath.setAttribute('d', path);
+    casingPath.setAttribute('class', 'connection-line-casing');
+    casingPath.style.stroke = 'var(--bg-secondary, #1e293b)';
+    casingPath.style.strokeWidth = '6';
+    casingPath.style.fill = 'none';
+    casingPath.style.strokeLinecap = 'round';
+    casingPath.style.strokeLinejoin = 'round';
+
+    svg.appendChild(casingPath); // Casing goes underneath
+    svg.appendChild(pathElement); // Main line on top
     return svg;
 }
 

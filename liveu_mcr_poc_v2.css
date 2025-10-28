@@ -759,15 +759,25 @@ select {
     stroke-width: 2;
     fill: none;
     stroke-linecap: round;
+    stroke-linejoin: round;
     filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.22));
     stroke-dashoffset: 0;
     stroke-dasharray: none;
     animation: none;
 }
 
+.connection-line-casing {
+    stroke: #1e293b;
+    stroke-width: 6;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
 .connection-line.streaming {
     stroke: rgba(255, 82, 110, 0.95);
     stroke-width: 2.5;
+    stroke-linejoin: round;
     filter: drop-shadow(0 0 16px rgba(255, 82, 110, 0.5));
     stroke-dasharray: none;
     animation: pulseGlow 2.8s ease-in-out infinite;
@@ -776,6 +786,7 @@ select {
 .connection-line.idle {
     stroke: rgba(255, 255, 255, 0.78);
     stroke-width: 2;
+    stroke-linejoin: round;
     stroke-dasharray: none;
     animation: none;
     filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.18));
