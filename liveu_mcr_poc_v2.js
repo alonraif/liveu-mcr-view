@@ -3906,27 +3906,95 @@ function removeEquipment(inventoryKey, equipmentId) {
 }
 
 // Script Preset Functions
+let currentPreviewPreset = null;
+
 function loadPresetScript(presetKey) {
     const preset = PRESET_SCRIPTS[presetKey];
     if (!preset) return;
-    
+
+    // Store the preset key for later loading
+    currentPreviewPreset = presetKey;
+
+    // Show preview section
+    document.getElementById('scriptPreviewSection').style.display = 'block';
+
+    // Populate preview header
+    document.getElementById('previewScriptName').textContent = preset.name;
+    document.getElementById('previewInventory').textContent = `📦 Inventory: ${inventories[preset.inventory]?.name || preset.inventory}`;
+
+    // Calculate duration
+    const maxTime = Math.max(...preset.events.map(e => e.time));
+    const minutes = Math.floor(maxTime / 60);
+    const seconds = maxTime % 60;
+    document.getElementById('previewDuration').textContent = `⏱️ Duration: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+    document.getElementById('previewEventCount').textContent = `📋 ${preset.events.length} events`;
+
+    // Get unique devices involved
+    const deviceIds = new Set();
+    preset.events.forEach(event => {
+        deviceIds.add(event.equipment);
+        if (event.destination && typeof event.destination === 'string') {
+            const parts = event.destination.split(':');
+            if (parts.length >= 2) {
+                deviceIds.add(parts[1]);
+            }
+        }
+    });
+
+    // Populate device list
+    const deviceListHTML = Array.from(deviceIds).map(deviceId => {
+        const equipment = findEquipmentByRef(deviceId);
+        if (!equipment) return '';
+        return `<div class="preview-device">${equipment.name} (${equipment.product})</div>`;
+    }).filter(html => html).join('');
+    document.getElementById('previewDeviceList').innerHTML = deviceListHTML;
+
+    // Populate event sequence
+    const eventListHTML = preset.events.map(event => {
+        const minutes = Math.floor(event.time / 60);
+        const seconds = event.time % 60;
+        const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        return `
+            <div class="preview-event">
+                <div class="preview-event-time">${timeStr}</div>
+                <div class="preview-event-desc">${event.description}</div>
+            </div>
+        `;
+    }).join('');
+    document.getElementById('previewEventList').innerHTML = eventListHTML;
+
+    // Scroll to preview section
+    document.getElementById('scriptPreviewSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeScriptPreview() {
+    document.getElementById('scriptPreviewSection').style.display = 'none';
+    currentPreviewPreset = null;
+}
+
+function confirmLoadScript() {
+    if (!currentPreviewPreset) return;
+
+    const preset = PRESET_SCRIPTS[currentPreviewPreset];
+    if (!preset) return;
+
     // Clear existing events
     scriptEvents = [];
-    
+
     // Switch to the correct inventory
     if (preset.inventory !== currentInventory) {
         document.getElementById('inventorySelect').value = preset.inventory;
         selectInventory();
     }
-    
+
     // Load preset events
     preset.events.forEach(event => {
         const equipment = findEquipmentByRef(event.equipment);
         if (!equipment) return;
-        
+
         let destinationDetails = null;
         let destinationName = '';
-        
+
         if (event.destination) {
             const parsedDestination = parseDestinationValue(event.destination.includes(':') ? event.destination : `${preset.inventory}:${event.destination}`);
             if (parsedDestination) {
@@ -3938,7 +4006,7 @@ function loadPresetScript(presetKey) {
                 }
             }
         }
-        
+
         const scriptEvent = {
             id: generateScriptEventId(),
             time: event.time,
@@ -3950,14 +4018,17 @@ function loadPresetScript(presetKey) {
             destinationName: destinationName,
             description: event.description
         };
-        
+
         scriptEvents.push(scriptEvent);
     });
-    
+
     scriptEvents.sort((a, b) => a.time - b.time);
     updateScriptTimeline();
     saveScriptEvents();
-    
+
+    // Close preview
+    closeScriptPreview();
+
     showAlert(`Loaded preset: ${preset.name}`, 'success');
 }
 

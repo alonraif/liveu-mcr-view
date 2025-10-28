@@ -227,6 +227,32 @@
                     </div>
                 </div>
 
+                <div class="section" id="scriptPreviewSection" style="display: none;">
+                    <h2 class="section-title">Script Preview</h2>
+                    <div class="script-preview">
+                        <div class="preview-header">
+                            <h3 id="previewScriptName"></h3>
+                            <div class="preview-meta">
+                                <span id="previewInventory"></span>
+                                <span id="previewDuration"></span>
+                                <span id="previewEventCount"></span>
+                            </div>
+                        </div>
+                        <div class="preview-devices">
+                            <h4>Devices Involved:</h4>
+                            <div id="previewDeviceList"></div>
+                        </div>
+                        <div class="preview-timeline">
+                            <h4>Event Sequence:</h4>
+                            <div id="previewEventList"></div>
+                        </div>
+                        <div class="preview-actions">
+                            <button class="btn btn-success" onclick="confirmLoadScript()">Load This Script</button>
+                            <button class="btn btn-secondary" onclick="closeScriptPreview()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="section">
                     <h2 class="section-title">Demo Script Controls</h2>
                     <div class="script-controls">

@@ -994,6 +994,109 @@ select {
     color: rgba(255, 255, 255, 0.58);
 }
 
+/* Script Preview Styles */
+.script-preview {
+    padding: 24px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(145deg, rgba(25, 36, 70, 0.92), rgba(14, 22, 42, 0.88));
+    border: 1px solid rgba(112, 225, 245, 0.2);
+    box-shadow: var(--shadow-strong);
+}
+
+.preview-header {
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(112, 225, 245, 0.15);
+}
+
+.preview-header h3 {
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: var(--color-accent-strong);
+}
+
+.preview-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.preview-meta span {
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(112, 225, 245, 0.08);
+    border: 1px solid rgba(112, 225, 245, 0.15);
+}
+
+.preview-devices {
+    margin-bottom: 24px;
+}
+
+.preview-devices h4,
+.preview-timeline h4 {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: var(--color-text-primary);
+}
+
+#previewDeviceList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.preview-device {
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    background: rgba(106, 139, 255, 0.12);
+    border: 1px solid rgba(106, 139, 255, 0.25);
+    font-size: 13px;
+    color: var(--color-text-primary);
+}
+
+.preview-timeline {
+    margin-bottom: 24px;
+}
+
+#previewEventList {
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.preview-event {
+    display: flex;
+    gap: 16px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: var(--radius-sm);
+    background: rgba(14, 24, 47, 0.7);
+    border-left: 3px solid rgba(112, 225, 245, 0.5);
+    font-size: 13px;
+}
+
+.preview-event-time {
+    font-weight: 600;
+    color: rgba(112, 225, 245, 0.9);
+    min-width: 60px;
+}
+
+.preview-event-desc {
+    color: var(--color-text-secondary);
+    flex: 1;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding-top: 18px;
+    border-top: 1px solid rgba(112, 225, 245, 0.15);
+}
+
 .script-timeline {
     max-height: 280px;
     padding-right: 12px;
