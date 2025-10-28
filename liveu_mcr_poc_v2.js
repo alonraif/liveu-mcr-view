@@ -1391,11 +1391,11 @@ function selectInventory(silent = false, overrideKey) {
 
 // Auto-Layout System
 function autoLayoutEquipment(equipment) {
-    const COLUMN_WIDTH = 450;
-    const ROW_HEIGHT = 450; // Increased from 320 to prevent vertical overlap
+    const COLUMN_WIDTH = 550;
+    const ROW_HEIGHT = 650; // Much larger to accommodate tall equipment cards
     const START_X = 80;
     const START_Y = 80;
-    const MAX_ITEMS_PER_COLUMN = 4; // Reduced from 6 to prevent too many items per column
+    const MAX_ITEMS_PER_COLUMN = 3; // Only 3 items per column to reduce vertical stacking
 
     // Categorize equipment by signal flow position
     const sources = []; // Units (encoders)
