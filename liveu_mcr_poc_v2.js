@@ -1,5 +1,5 @@
 // Version tracking for cache busting
-const APP_VERSION = '20250128-001';
+const APP_VERSION = '20250128-002';
 console.log(`%c🚀 LiveU MCR Dashboard v${APP_VERSION}`, 'color: #4CAF50; font-weight: bold; font-size: 14px;');
 
 const STORAGE_KEYS = {
@@ -3154,10 +3154,23 @@ function redrawConnections() {
                 preferDownstream: false
             });
             if (upstream && upstream.equipment && upstream.equipment.id !== item.id) {
-                addConnection(upstream.equipment.id, item.id, 'streaming', {
-                    fromSelector: getMatchSelector(upstream, 'output'),
-                    toSelector: buildDestinationSelector(item.id, 'input')
-                });
+                console.log(`[DESTINATION UPSTREAM] Destination ${item.name} trying to draw connection from ${upstream.equipment.name} (${upstream.equipment.type})`);
+
+                // IMPORTANT: Only draw destination←upstream connections if upstream is a server/transceiver
+                // Do NOT draw if upstream is a unit - those connections are already handled by unit processing
+                const isValidUpstream = upstream.equipment.type === 'server' ||
+                                       upstream.equipment.type === 'transceiver' ||
+                                       upstream.equipment.type === 'srt-in';
+
+                if (isValidUpstream) {
+                    console.log(`[DESTINATION←SERVER] Drawing connection: ${upstream.equipment.name} → ${item.name}`);
+                    addConnection(upstream.equipment.id, item.id, 'streaming', {
+                        fromSelector: getMatchSelector(upstream, 'output'),
+                        toSelector: buildDestinationSelector(item.id, 'input')
+                    });
+                } else {
+                    console.log(`[DESTINATION UPSTREAM SKIP] Skipping unit upstream ${upstream.equipment.name} - connection already handled by unit processing`);
+                }
             }
         }
 
@@ -3168,10 +3181,23 @@ function redrawConnections() {
                     preferDownstream: false
                 });
                 if (ingestSource && ingestSource.equipment && ingestSource.equipment.id !== item.id) {
-                    addConnection(ingestSource.equipment.id, item.id, 'idle', {
-                        fromSelector: getMatchSelector(ingestSource, 'output'),
-                        toSelector: buildIngestSelector(item.id, 'input')
-                    });
+                    console.log(`[INGEST UPSTREAM] Ingest ${item.name} trying to draw connection from ${ingestSource.equipment.name} (${ingestSource.equipment.type})`);
+
+                    // IMPORTANT: Only draw ingest←upstream connections if upstream is a server/transceiver
+                    // Do NOT draw if upstream is a unit - those connections are already handled by unit processing
+                    const isValidUpstream = ingestSource.equipment.type === 'server' ||
+                                           ingestSource.equipment.type === 'transceiver' ||
+                                           ingestSource.equipment.type === 'srt-in';
+
+                    if (isValidUpstream) {
+                        console.log(`[INGEST←SERVER] Drawing connection: ${ingestSource.equipment.name} → ${item.name}`);
+                        addConnection(ingestSource.equipment.id, item.id, 'idle', {
+                            fromSelector: getMatchSelector(ingestSource, 'output'),
+                            toSelector: buildIngestSelector(item.id, 'input')
+                        });
+                    } else {
+                        console.log(`[INGEST UPSTREAM SKIP] Skipping unit upstream ${ingestSource.equipment.name} - connection already handled by unit processing`);
+                    }
                 }
             });
         }
