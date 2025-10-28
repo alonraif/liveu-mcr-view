@@ -1365,11 +1365,11 @@ function selectInventory(silent = false, overrideKey) {
 
 // Auto-Layout System
 function autoLayoutEquipment(equipment) {
-    const COLUMN_WIDTH = 350;
-    const ROW_HEIGHT = 280;
-    const MIN_SPACING = 40;
-    const START_X = 100;
-    const START_Y = 100;
+    const COLUMN_WIDTH = 400;
+    const ROW_HEIGHT = 320;
+    const START_X = 80;
+    const START_Y = 80;
+    const MAX_ITEMS_PER_COLUMN = 6; // Split into sub-columns if more items
 
     // Categorize equipment by signal flow position
     const sources = []; // Units (encoders)
@@ -1388,23 +1388,36 @@ function autoLayoutEquipment(equipment) {
         }
     });
 
-    // Layout function for a column
-    function layoutColumn(items, columnX) {
-        let currentY = START_Y;
+    // Layout function for a group with multi-column support
+    function layoutGroup(items, startColumnX) {
         const positions = [];
+        const itemsPerColumn = Math.min(MAX_ITEMS_PER_COLUMN, Math.ceil(items.length / Math.ceil(items.length / MAX_ITEMS_PER_COLUMN)));
 
-        items.forEach(item => {
-            positions.push({ x: columnX, y: currentY });
-            currentY += ROW_HEIGHT;
+        items.forEach((item, index) => {
+            const columnIndex = Math.floor(index / itemsPerColumn);
+            const rowIndex = index % itemsPerColumn;
+
+            positions.push({
+                x: startColumnX + (columnIndex * COLUMN_WIDTH),
+                y: START_Y + (rowIndex * ROW_HEIGHT)
+            });
         });
 
         return positions;
     }
 
+    // Calculate column positions for each group
+    const sourceColumns = Math.ceil(sources.length / MAX_ITEMS_PER_COLUMN);
+    const middleColumns = Math.ceil(middle.length / MAX_ITEMS_PER_COLUMN);
+
+    const sourceStartX = START_X;
+    const middleStartX = START_X + (sourceColumns * COLUMN_WIDTH) + 100;
+    const destStartX = middleStartX + (middleColumns * COLUMN_WIDTH) + 100;
+
     // Calculate positions for each group
-    const sourcePositions = layoutColumn(sources, START_X);
-    const middlePositions = layoutColumn(middle, START_X + COLUMN_WIDTH);
-    const destPositions = layoutColumn(destinations, START_X + COLUMN_WIDTH * 2);
+    const sourcePositions = layoutGroup(sources, sourceStartX);
+    const middlePositions = layoutGroup(middle, middleStartX);
+    const destPositions = layoutGroup(destinations, destStartX);
 
     // Apply positions to equipment
     sources.forEach((item, i) => {
