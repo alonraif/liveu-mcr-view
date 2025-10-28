@@ -11,13 +11,50 @@ const DEFAULT_INVENTORIES = {
         equipment: [
             {
                 id: 'bc-lu800pro-001',
-                name: 'Studio-LU800-Pro-Main',
+                name: 'Studio-Cam-A',
                 product: 'LU800-Pro',
                 mode: '1080p50',
                 uptime: '4h 12m',
+                status: 'streaming',
+                x: 100,
+                y: 150,
+                type: 'unit',
+                channel: 'Channel-1',
+                encoders: [
+                    { id: 1, status: 'streaming', channel: 'Channel-1' },
+                    { id: 2, status: 'idle', channel: null },
+                    { id: 3, status: 'idle', channel: null },
+                    { id: 4, status: 'idle', channel: null }
+                ],
+                bandwidth: { current: 3800, max: 10000 },
+                alerts: [],
+                onAir: true,
+                story: {
+                    slugline: 'Evening News Desk',
+                    crew: 'Anchor Camera A',
+                    id: 'story-news-001'
+                },
+                battery: {
+                    percentage: 100,
+                    remainingMinutes: 0,
+                    charging: true
+                },
+                delay: 1200,
+                videoReturn: true,
+                location: 'Studio A - Camera Left',
+                links: [
+                    { name: 'Studio Ethernet', signal: 5, bandwidth: 10000, connected: true, type: 'ethernet' }
+                ]
+            },
+            {
+                id: 'bc-lu800pro-002',
+                name: 'Studio-Cam-B',
+                product: 'LU800-Pro',
+                mode: '1080p50',
+                uptime: '4h 10m',
                 status: 'online',
                 x: 100,
-                y: 200,
+                y: 300,
                 type: 'unit',
                 encoders: [
                     { id: 1, status: 'idle', channel: null },
@@ -26,15 +63,103 @@ const DEFAULT_INVENTORIES = {
                     { id: 4, status: 'idle', channel: null }
                 ],
                 bandwidth: { current: 0, max: 10000 },
-                alerts: []
+                alerts: [],
+                onAir: false,
+                battery: {
+                    percentage: 100,
+                    remainingMinutes: 0,
+                    charging: true
+                },
+                delay: 1200,
+                videoReturn: true,
+                location: 'Studio A - Camera Right',
+                links: [
+                    { name: 'Studio Ethernet', signal: 5, bandwidth: 0, connected: true, type: 'ethernet' }
+                ]
+            },
+            {
+                id: 'bc-lu800pro-003',
+                name: 'Studio-Cam-C',
+                product: 'LU800-Pro',
+                mode: '4K25',
+                uptime: '3h 58m',
+                status: 'online',
+                x: 100,
+                y: 450,
+                type: 'unit',
+                encoders: [
+                    { id: 1, status: 'idle', channel: null },
+                    { id: 2, status: 'idle', channel: null },
+                    { id: 3, status: 'idle', channel: null },
+                    { id: 4, status: 'idle', channel: null }
+                ],
+                bandwidth: { current: 0, max: 10000 },
+                alerts: [],
+                onAir: false,
+                battery: {
+                    percentage: 100,
+                    remainingMinutes: 0,
+                    charging: true
+                },
+                delay: 1200,
+                videoReturn: true,
+                location: 'Studio A - Wide Shot',
+                links: [
+                    { name: 'Studio Ethernet', signal: 5, bandwidth: 0, connected: true, type: 'ethernet' }
+                ]
+            },
+            {
+                id: 'bc-lu600-001',
+                name: 'Mobile-Reporter-1',
+                product: 'LU600',
+                mode: '1080i50',
+                uptime: '2h 15m',
+                status: 'online',
+                x: 100,
+                y: 600,
+                type: 'unit',
+                encoders: [
+                    { id: 1, status: 'idle', channel: null }
+                ],
+                bandwidth: { current: 0, max: 5000 },
+                alerts: [],
+                onAir: false,
+                battery: {
+                    percentage: 78,
+                    remainingMinutes: 145,
+                    charging: false
+                },
+                delay: 2800,
+                videoReturn: false,
+                location: 'News Van - Garage',
+                links: [
+                    { name: 'AT&T 5G', signal: 5, bandwidth: 0, technology: '5G', connected: false },
+                    { name: 'Verizon LTE', signal: 4, bandwidth: 0, technology: 'LTE', connected: false }
+                ]
             },
             {
                 id: 'bc-lu2000-001',
-                name: 'Studio-LU2000-Primary',
+                name: 'Broadcast-Server-Main',
                 product: 'LU2000',
                 status: 'online',
-                x: 450,
-                y: 200,
+                x: 500,
+                y: 250,
+                type: 'server',
+                channels: [
+                    { id: 'Channel-1', status: 'streaming', connectedUnit: 'bc-lu800pro-001', recording: 'bc-ingest-001' },
+                    { id: 'Channel-2', status: 'idle', connectedUnit: null, recording: null },
+                    { id: 'Channel-3', status: 'idle', connectedUnit: null, recording: null },
+                    { id: 'Channel-4', status: 'idle', connectedUnit: null, recording: null }
+                ],
+                ingestAssociation: 'bc-ingest-001'
+            },
+            {
+                id: 'bc-lu4000-001',
+                name: 'Broadcast-Server-Backup',
+                product: 'LU4000',
+                status: 'online',
+                x: 500,
+                y: 450,
                 type: 'server',
                 channels: [
                     { id: 'Channel-1', status: 'idle', connectedUnit: null, recording: null },
@@ -46,34 +171,46 @@ const DEFAULT_INVENTORIES = {
             },
             {
                 id: 'bc-ingest-001',
-                name: 'Recording-Server-1',
+                name: 'Recording-Server-Primary',
                 product: 'Ingest',
                 status: 'online',
-                x: 750,
-                y: 150,
+                x: 850,
+                y: 200,
+                type: 'ingest',
+                associatedChannels: ['bc-lu2000-001:Channel-1'],
+                diskSpace: { used: 3200, total: 10000 },
+                activeRecordings: ['Channel-1']
+            },
+            {
+                id: 'bc-ingest-002',
+                name: 'Recording-Server-Archive',
+                product: 'Ingest',
+                status: 'online',
+                x: 850,
+                y: 380,
                 type: 'ingest',
                 associatedChannels: [],
-                diskSpace: { used: 2500, total: 10000 }, // GB
+                diskSpace: { used: 7800, total: 20000 },
                 activeRecordings: []
             },
             {
                 id: 'bc-srt-001',
-                name: 'SRT-Input-1',
+                name: 'SRT-Input-Studio',
                 product: 'SRT-In',
                 status: 'online',
-                x: 100,
-                y: 400,
+                x: 300,
+                y: 100,
                 type: 'srt-in',
                 channel: { status: 'idle', source: null, outputChannel: null },
                 acceptedFormats: ['SRT', 'RTMP']
             },
             {
                 id: 'bc-transceiver-001',
-                name: 'Field-Transceiver-1',
+                name: 'Studio-Transceiver',
                 product: 'Transceiver',
                 status: 'online',
-                x: 450,
-                y: 400,
+                x: 300,
+                y: 600,
                 type: 'transceiver',
                 config: { encoders: 2, decoders: 2 },
                 encoders: [
@@ -84,6 +221,40 @@ const DEFAULT_INVENTORIES = {
                     { id: 1, status: 'idle', connectedUnit: null },
                     { id: 2, status: 'idle', connectedUnit: null }
                 ]
+            },
+            {
+                id: 'bc-sdi-001',
+                name: 'SDI-Output-Master',
+                product: 'SDI',
+                status: 'online',
+                x: 850,
+                y: 550,
+                type: 'destination',
+                hardware: 'DeckLink 8K Pro',
+                supportsEncoderInput: true,
+                connectedChannel: 'Channel-1'
+            },
+            {
+                id: 'bc-ndi-001',
+                name: 'NDI-Output-Production',
+                product: 'NDI',
+                status: 'online',
+                x: 1050,
+                y: 200,
+                type: 'destination',
+                streamName: 'Studio-A-Program',
+                connectedChannel: null
+            },
+            {
+                id: 'bc-srt-out-001',
+                name: 'SRT-Output-CDN',
+                product: 'SRT',
+                status: 'online',
+                x: 1050,
+                y: 380,
+                type: 'destination',
+                mode: 'caller',
+                connectedChannel: null
             }
         ]
     },
@@ -91,14 +262,47 @@ const DEFAULT_INVENTORIES = {
         name: 'Field Operations',
         equipment: [
             {
+                id: 'fo-lu800pro-001',
+                name: 'Helicopter-Cam',
+                product: 'LU800-Pro',
+                mode: '1080p50',
+                uptime: '0h 45m',
+                status: 'online',
+                x: 100,
+                y: 100,
+                type: 'unit',
+                encoders: [
+                    { id: 1, status: 'idle', channel: null },
+                    { id: 2, status: 'idle', channel: null },
+                    { id: 3, status: 'idle', channel: null },
+                    { id: 4, status: 'idle', channel: null }
+                ],
+                bandwidth: { current: 0, max: 10000 },
+                alerts: [],
+                onAir: false,
+                battery: {
+                    percentage: 92,
+                    remainingMinutes: 155,
+                    charging: false
+                },
+                delay: 3200,
+                videoReturn: true,
+                location: 'Airborne - 1500ft AGL',
+                links: [
+                    { name: 'AT&T 5G', signal: 3, bandwidth: 0, technology: '5G', connected: false },
+                    { name: 'Verizon 5G', signal: 4, bandwidth: 0, technology: '5G', connected: false },
+                    { name: 'Satellite', signal: 5, bandwidth: 0, technology: 'SAT', connected: false }
+                ]
+            },
+            {
                 id: 'fo-lu600-001',
-                name: 'Field-LU600-Reporter',
+                name: 'Reporter-Downtown',
                 product: 'LU600',
                 mode: '1080i50',
                 uptime: '2h 45m',
                 status: 'streaming',
-                x: 150,
-                y: 150,
+                x: 100,
+                y: 280,
                 type: 'unit',
                 channel: 'Channel-1',
                 encoders: [
@@ -106,64 +310,129 @@ const DEFAULT_INVENTORIES = {
                 ],
                 bandwidth: { current: 4500, max: 5000 },
                 alerts: [],
-                // HACKATHON ENHANCEMENTS
                 onAir: true,
                 story: {
-                    slugline: 'Breaking News - City Hall',
-                    crew: 'John Reporter',
+                    slugline: 'Breaking: City Hall Protest',
+                    crew: 'Sarah Martinez',
                     id: 'story-12345'
                 },
                 battery: {
-                    percentage: 86,
-                    remainingMinutes: 263,
+                    percentage: 42,
+                    remainingMinutes: 86,
                     charging: false
                 },
                 delay: 2500,
                 videoReturn: true,
-                location: 'Central Park, Manhattan',
+                location: 'City Hall Plaza',
                 links: [
                     { name: 'AT&T 5G', signal: 4, bandwidth: 2500, technology: '5G', connected: true },
                     { name: 'Verizon LTE', signal: 5, bandwidth: 3100, technology: 'LTE', connected: true },
-                    { name: 'ETH0', signal: 5, bandwidth: 5000, connected: true, type: 'ethernet' }
+                    { name: 'WiFi Hotspot', signal: 3, bandwidth: 800, connected: false, type: 'wifi' }
+                ]
+            },
+            {
+                id: 'fo-lu600-002',
+                name: 'Reporter-Midtown',
+                product: 'LU600',
+                mode: '1080i50',
+                uptime: '1h 15m',
+                status: 'online',
+                x: 100,
+                y: 430,
+                type: 'unit',
+                encoders: [
+                    { id: 1, status: 'idle', channel: null }
+                ],
+                bandwidth: { current: 0, max: 5000 },
+                alerts: [],
+                onAir: false,
+                story: {
+                    slugline: 'Traffic Update - 5th Avenue',
+                    crew: 'Mike Johnson',
+                    id: 'story-67890'
+                },
+                battery: {
+                    percentage: 68,
+                    remainingMinutes: 128,
+                    charging: false
+                },
+                delay: 2400,
+                videoReturn: false,
+                location: 'Times Square',
+                links: [
+                    { name: 'T-Mobile 5G', signal: 5, bandwidth: 0, technology: '5G', connected: false },
+                    { name: 'Verizon LTE', signal: 4, bandwidth: 0, technology: 'LTE', connected: false }
                 ]
             },
             {
                 id: 'fo-lu610-001',
-                name: 'Field-LU610-Backup',
+                name: 'Sports-Sideline',
                 product: 'LU610',
                 mode: '1080p25',
-                uptime: '1h 30m',
-                status: 'offline',
-                x: 150,
-                y: 350,
+                uptime: '3h 20m',
+                status: 'online',
+                x: 100,
+                y: 580,
                 type: 'unit',
                 encoders: [
-                    { id: 1, status: 'offline', channel: null }
+                    { id: 1, status: 'idle', channel: null }
                 ],
                 bandwidth: { current: 0, max: 6000 },
                 alerts: [],
-                // HACKATHON ENHANCEMENTS
+                onAir: false,
+                story: {
+                    slugline: 'Game Day - Yankees vs Red Sox',
+                    crew: 'Sports Team Alpha',
+                    id: 'story-sports-001'
+                },
+                battery: {
+                    percentage: 85,
+                    remainingMinutes: 210,
+                    charging: false
+                },
+                delay: 1800,
+                videoReturn: true,
+                location: 'Yankee Stadium - Field Level',
+                links: [
+                    { name: 'Stadium 5G', signal: 5, bandwidth: 0, technology: '5G', connected: false },
+                    { name: 'Stadium WiFi', signal: 5, bandwidth: 0, connected: false, type: 'wifi' }
+                ]
+            },
+            {
+                id: 'fo-lu610-002',
+                name: 'Van-Backup-Unit',
+                product: 'LU610',
+                mode: '1080p50',
+                uptime: '0h 05m',
+                status: 'online',
+                x: 100,
+                y: 730,
+                type: 'unit',
+                encoders: [
+                    { id: 1, status: 'idle', channel: null }
+                ],
+                bandwidth: { current: 0, max: 6000 },
+                alerts: [],
                 onAir: false,
                 battery: {
                     percentage: 100,
-                    remainingMinutes: 360,
+                    remainingMinutes: 240,
                     charging: true
                 },
                 delay: 2500,
                 videoReturn: false,
-                location: 'News Van (parked)',
+                location: 'Mobile Unit 3 - Standby',
                 links: [
-                    { name: 'T-Mobile 5G', signal: 5, bandwidth: 0, technology: '5G', connected: false },
-                    { name: 'WiFi', signal: 0, bandwidth: 0, connected: false, type: 'wifi' }
+                    { name: 'Van Router', signal: 5, bandwidth: 0, connected: true, type: 'ethernet' }
                 ]
             },
             {
                 id: 'fo-lu4000-001',
-                name: 'Field-LU4000-Main',
+                name: 'Field-Operations-HQ',
                 product: 'LU4000',
                 status: 'online',
-                x: 500,
-                y: 250,
+                x: 550,
+                y: 300,
                 type: 'server',
                 channels: [
                     { id: 'Channel-1', status: 'streaming', connectedUnit: 'fo-lu600-001', recording: 'fo-ingest-001' },
@@ -174,16 +443,289 @@ const DEFAULT_INVENTORIES = {
                 ingestAssociation: 'fo-ingest-001'
             },
             {
+                id: 'fo-lu2000-001',
+                name: 'Sports-Server',
+                product: 'LU2000',
+                status: 'online',
+                x: 550,
+                y: 550,
+                type: 'server',
+                channels: [
+                    { id: 'Channel-1', status: 'idle', connectedUnit: null, recording: null },
+                    { id: 'Channel-2', status: 'idle', connectedUnit: null, recording: null },
+                    { id: 'Channel-3', status: 'idle', connectedUnit: null, recording: null },
+                    { id: 'Channel-4', status: 'idle', connectedUnit: null, recording: null }
+                ],
+                ingestAssociation: null
+            },
+            {
                 id: 'fo-ingest-001',
-                name: 'Field-Recording-Server',
+                name: 'Field-Recordings-Main',
                 product: 'Ingest',
                 status: 'online',
-                x: 750,
-                y: 250,
+                x: 900,
+                y: 200,
                 type: 'ingest',
                 associatedChannels: ['fo-lu4000-001:Channel-1'],
-                diskSpace: { used: 650, total: 5000 },
+                diskSpace: { used: 1250, total: 8000 },
                 activeRecordings: ['Channel-1']
+            },
+            {
+                id: 'fo-ingest-002',
+                name: 'Field-Recordings-Sports',
+                product: 'Ingest',
+                status: 'online',
+                x: 900,
+                y: 450,
+                type: 'ingest',
+                associatedChannels: [],
+                diskSpace: { used: 4200, total: 10000 },
+                activeRecordings: []
+            },
+            {
+                id: 'fo-transceiver-001',
+                name: 'Mobile-Transceiver-1',
+                product: 'Transceiver',
+                status: 'online',
+                x: 350,
+                y: 150,
+                type: 'transceiver',
+                config: { encoders: 2, decoders: 2 },
+                encoders: [
+                    { id: 1, status: 'idle', channel: null },
+                    { id: 2, status: 'idle', channel: null }
+                ],
+                decoders: [
+                    { id: 1, status: 'idle', connectedUnit: null },
+                    { id: 2, status: 'idle', connectedUnit: null }
+                ]
+            },
+            {
+                id: 'fo-srt-001',
+                name: 'Field-SRT-Input',
+                product: 'SRT-In',
+                status: 'online',
+                x: 350,
+                y: 650,
+                type: 'srt-in',
+                channel: { status: 'idle', source: null, outputChannel: null },
+                acceptedFormats: ['SRT', 'RTMP']
+            },
+            {
+                id: 'fo-sdi-001',
+                name: 'Truck-SDI-Output',
+                product: 'SDI',
+                status: 'online',
+                x: 900,
+                y: 650,
+                type: 'destination',
+                hardware: 'DeckLink Quad 2',
+                supportsEncoderInput: true,
+                connectedChannel: null
+            }
+        ]
+    },
+    'studio-production': {
+        name: 'Studio Production',
+        equipment: [
+            {
+                id: 'st-lu800pro-001',
+                name: 'Studio-A-Cam-1',
+                product: 'LU800-Pro',
+                mode: '4K25',
+                uptime: '8h 42m',
+                status: 'online',
+                x: 100,
+                y: 150,
+                type: 'unit',
+                encoders: [
+                    { id: 1, status: 'idle', channel: null },
+                    { id: 2, status: 'idle', channel: null },
+                    { id: 3, status: 'idle', channel: null },
+                    { id: 4, status: 'idle', channel: null }
+                ],
+                bandwidth: { current: 0, max: 10000 },
+                alerts: [],
+                onAir: false,
+                battery: {
+                    percentage: 100,
+                    remainingMinutes: 0,
+                    charging: true
+                },
+                delay: 800,
+                videoReturn: true,
+                location: 'Studio A - Position 1',
+                links: [
+                    { name: 'Fiber Optic', signal: 5, bandwidth: 0, connected: true, type: 'ethernet' }
+                ]
+            },
+            {
+                id: 'st-lu800pro-002',
+                name: 'Studio-A-Cam-2',
+                product: 'LU800-Pro',
+                mode: '4K25',
+                uptime: '8h 40m',
+                status: 'online',
+                x: 100,
+                y: 300,
+                type: 'unit',
+                encoders: [
+                    { id: 1, status: 'idle', channel: null },
+                    { id: 2, status: 'idle', channel: null },
+                    { id: 3, status: 'idle', channel: null },
+                    { id: 4, status: 'idle', channel: null }
+                ],
+                bandwidth: { current: 0, max: 10000 },
+                alerts: [],
+                onAir: false,
+                battery: {
+                    percentage: 100,
+                    remainingMinutes: 0,
+                    charging: true
+                },
+                delay: 800,
+                videoReturn: true,
+                location: 'Studio A - Position 2',
+                links: [
+                    { name: 'Fiber Optic', signal: 5, bandwidth: 0, connected: true, type: 'ethernet' }
+                ]
+            },
+            {
+                id: 'st-lu800pro-003',
+                name: 'Studio-A-Cam-3',
+                product: 'LU800-Pro',
+                mode: '4K25',
+                uptime: '8h 38m',
+                status: 'online',
+                x: 100,
+                y: 450,
+                type: 'unit',
+                encoders: [
+                    { id: 1, status: 'idle', channel: null },
+                    { id: 2, status: 'idle', channel: null },
+                    { id: 3, status: 'idle', channel: null },
+                    { id: 4, status: 'idle', channel: null }
+                ],
+                bandwidth: { current: 0, max: 10000 },
+                alerts: [],
+                onAir: false,
+                battery: {
+                    percentage: 100,
+                    remainingMinutes: 0,
+                    charging: true
+                },
+                delay: 800,
+                videoReturn: true,
+                location: 'Studio A - Wide Shot',
+                links: [
+                    { name: 'Fiber Optic', signal: 5, bandwidth: 0, connected: true, type: 'ethernet' }
+                ]
+            },
+            {
+                id: 'st-lu600-001',
+                name: 'Interview-Portable',
+                product: 'LU600',
+                mode: '1080p50',
+                uptime: '1h 25m',
+                status: 'online',
+                x: 100,
+                y: 600,
+                type: 'unit',
+                encoders: [
+                    { id: 1, status: 'idle', channel: null }
+                ],
+                bandwidth: { current: 0, max: 5000 },
+                alerts: [],
+                onAir: false,
+                story: {
+                    slugline: 'Guest Interview Setup',
+                    crew: 'Production Team B',
+                    id: 'story-interview-001'
+                },
+                battery: {
+                    percentage: 88,
+                    remainingMinutes: 175,
+                    charging: false
+                },
+                delay: 1200,
+                videoReturn: true,
+                location: 'Green Room',
+                links: [
+                    { name: 'Studio WiFi 6', signal: 5, bandwidth: 0, connected: false, type: 'wifi' },
+                    { name: 'Ethernet Dock', signal: 5, bandwidth: 0, connected: true, type: 'ethernet' }
+                ]
+            },
+            {
+                id: 'st-lu2000-001',
+                name: 'Studio-Server-Main',
+                product: 'LU2000',
+                status: 'online',
+                x: 550,
+                y: 300,
+                type: 'server',
+                channels: [
+                    { id: 'Studio-A', status: 'idle', connectedUnit: null, recording: null },
+                    { id: 'Studio-B', status: 'idle', connectedUnit: null, recording: null },
+                    { id: 'Studio-C', status: 'idle', connectedUnit: null, recording: null },
+                    { id: 'Studio-D', status: 'idle', connectedUnit: null, recording: null }
+                ],
+                ingestAssociation: 'st-ingest-001'
+            },
+            {
+                id: 'st-ingest-001',
+                name: 'Studio-Recording-Primary',
+                product: 'Ingest',
+                status: 'online',
+                x: 900,
+                y: 200,
+                type: 'ingest',
+                associatedChannels: [],
+                diskSpace: { used: 5400, total: 15000 },
+                activeRecordings: []
+            },
+            {
+                id: 'st-sdi-output-001',
+                name: 'Master-Control-SDI',
+                product: 'SDI',
+                status: 'online',
+                x: 900,
+                y: 400,
+                type: 'destination',
+                hardware: 'DeckLink 8K Pro',
+                supportsEncoderInput: true,
+                connectedChannel: null
+            },
+            {
+                id: 'st-ndi-output-001',
+                name: 'Studio-NDI-Main',
+                product: 'NDI',
+                status: 'online',
+                x: 900,
+                y: 550,
+                type: 'destination',
+                streamName: 'Studio-A-Program-Feed',
+                connectedChannel: null
+            },
+            {
+                id: 'st-srt-out-001',
+                name: 'Web-Stream-SRT',
+                product: 'SRT',
+                status: 'online',
+                x: 1100,
+                y: 300,
+                type: 'destination',
+                mode: 'caller',
+                connectedChannel: null
+            },
+            {
+                id: 'st-rtmp-001',
+                name: 'Social-Media-Stream',
+                product: 'RTMP',
+                status: 'online',
+                x: 1100,
+                y: 450,
+                type: 'destination',
+                connectedChannel: null
             }
         ]
     },
@@ -192,39 +734,139 @@ const DEFAULT_INVENTORIES = {
         equipment: [
             {
                 id: 'cl-lu800hdr-001',
-                name: 'Remote-LU800-HDR',
+                name: 'Remote-Cinematographer',
                 product: 'LU800-HDR',
                 mode: '1080p50-HDR',
                 uptime: '6h 15m',
                 status: 'streaming',
                 x: 100,
-                y: 200,
+                y: 150,
                 type: 'unit',
+                channel: 'Cloud-Channel-1',
                 encoders: [
                     { id: 1, status: 'streaming', channel: 'Cloud-Channel-1' }
                 ],
                 bandwidth: { current: 4500, max: 8000 },
-                alerts: [{ type: 'low-bandwidth', timestamp: Date.now() - 30000 }]
-            },
-            {
-                id: 'cl-cloudmmh-001',
-                name: 'Cloud-MMH-Instance',
-                product: 'Cloud-MMH',
-                status: 'online',
-                x: 450,
-                y: 200,
-                type: 'server',
-                channels: [
-                    { id: 'Cloud-Channel-1', status: 'streaming', connectedUnit: 'cl-lu800hdr-001', recording: null }
+                alerts: [],
+                onAir: true,
+                story: {
+                    slugline: 'Documentary - Amazon Rainforest',
+                    crew: 'Remote Production Team',
+                    id: 'story-doc-001'
+                },
+                battery: {
+                    percentage: 54,
+                    remainingMinutes: 98,
+                    charging: false
+                },
+                delay: 4200,
+                videoReturn: false,
+                location: 'Amazon Basin, Brazil',
+                links: [
+                    { name: 'Starlink', signal: 4, bandwidth: 2800, technology: 'SAT', connected: true },
+                    { name: 'Local 4G', signal: 2, bandwidth: 800, technology: 'LTE', connected: true }
                 ]
             },
             {
+                id: 'cl-lu600-001',
+                name: 'Correspondent-London',
+                product: 'LU600',
+                mode: '1080p50',
+                uptime: '3h 10m',
+                status: 'online',
+                x: 100,
+                y: 350,
+                type: 'unit',
+                encoders: [
+                    { id: 1, status: 'idle', channel: null }
+                ],
+                bandwidth: { current: 0, max: 5000 },
+                alerts: [],
+                onAir: false,
+                story: {
+                    slugline: 'International Bureau - UK Politics',
+                    crew: 'London Bureau',
+                    id: 'story-intl-002'
+                },
+                battery: {
+                    percentage: 72,
+                    remainingMinutes: 142,
+                    charging: false
+                },
+                delay: 3800,
+                videoReturn: false,
+                location: 'Westminster, London, UK',
+                links: [
+                    { name: 'Vodafone 5G', signal: 5, bandwidth: 0, technology: '5G', connected: false },
+                    { name: 'EE 5G', signal: 4, bandwidth: 0, technology: '5G', connected: false }
+                ]
+            },
+            {
+                id: 'cl-lu610-001',
+                name: 'Correspondent-Tokyo',
+                product: 'LU610',
+                mode: '1080p50',
+                uptime: '5h 30m',
+                status: 'online',
+                x: 100,
+                y: 520,
+                type: 'unit',
+                encoders: [
+                    { id: 1, status: 'idle', channel: null }
+                ],
+                bandwidth: { current: 0, max: 6000 },
+                alerts: [],
+                onAir: false,
+                story: {
+                    slugline: 'Asia Bureau - Tech Conference',
+                    crew: 'Tokyo Bureau',
+                    id: 'story-asia-003'
+                },
+                battery: {
+                    percentage: 45,
+                    remainingMinutes: 88,
+                    charging: false
+                },
+                delay: 5100,
+                videoReturn: false,
+                location: 'Shibuya, Tokyo, Japan',
+                links: [
+                    { name: 'NTT Docomo 5G', signal: 5, bandwidth: 0, technology: '5G', connected: false },
+                    { name: 'SoftBank 5G', signal: 4, bandwidth: 0, technology: '5G', connected: false }
+                ]
+            },
+            {
+                id: 'cl-cloudmmh-001',
+                name: 'Cloud-MMH-Primary',
+                product: 'Cloud-MMH',
+                status: 'online',
+                x: 600,
+                y: 300,
+                type: 'server',
+                channels: [
+                    { id: 'Cloud-Channel-1', status: 'streaming', connectedUnit: 'cl-lu800hdr-001', recording: 'cl-ingest-001' }
+                ],
+                ingestAssociation: 'cl-ingest-001'
+            },
+            {
+                id: 'cl-ingest-001',
+                name: 'Cloud-Storage',
+                product: 'Ingest',
+                status: 'online',
+                x: 950,
+                y: 200,
+                type: 'ingest',
+                associatedChannels: ['cl-cloudmmh-001:Cloud-Channel-1'],
+                diskSpace: { used: 850, total: 5000 },
+                activeRecordings: ['Cloud-Channel-1']
+            },
+            {
                 id: 'cl-sdi-001',
-                name: 'SDI-Output-1',
+                name: 'Cloud-to-Broadcast-SDI',
                 product: 'SDI',
                 status: 'online',
-                x: 750,
-                y: 200,
+                x: 950,
+                y: 400,
                 type: 'destination',
                 hardware: 'DeckLink 4K Extreme 12G',
                 supportsEncoderInput: true,
@@ -232,13 +874,34 @@ const DEFAULT_INVENTORIES = {
             },
             {
                 id: 'cl-ndi-001',
-                name: 'NDI-Stream-1',
+                name: 'Cloud-NDI-Feed',
                 product: 'NDI',
                 status: 'online',
-                x: 750,
+                x: 950,
+                y: 550,
+                type: 'destination',
+                streamName: 'LiveU-Cloud-Production',
+                connectedChannel: null
+            },
+            {
+                id: 'cl-srt-001',
+                name: 'Cloud-SRT-Distribution',
+                product: 'SRT',
+                status: 'online',
+                x: 1150,
                 y: 300,
                 type: 'destination',
-                streamName: 'LiveU-Remote-Feed',
+                mode: 'caller',
+                connectedChannel: null
+            },
+            {
+                id: 'cl-rtmp-001',
+                name: 'Cloud-RTMP-Backup',
+                product: 'RTMP',
+                status: 'online',
+                x: 1150,
+                y: 450,
+                type: 'destination',
                 connectedChannel: null
             }
         ]
@@ -445,6 +1108,113 @@ const PRESET_SCRIPTS = {
             { time: 90, equipment: "cl-ndi-001", action: "online", description: "NDI stream ready" },
             { time: 100, equipment: "cl-lu800hdr-001", action: "set-battery", value: 48, description: "Battery below 50%" },
             { time: 120, equipment: "cl-lu800hdr-001", action: "stop-streaming", description: "Production complete" }
+        ]
+    },
+    helicopter: {
+        name: "Helicopter Chase",
+        inventory: "field-ops",
+        events: [
+            { time: 5, equipment: "fo-lu4000-001", action: "online", description: "Field ops HQ ready" },
+            { time: 10, equipment: "fo-lu800pro-001", action: "online", description: "Helicopter unit powering up" },
+            { time: 20, equipment: "fo-lu800pro-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-1", description: "🚁 Helicopter feed LIVE - pursuit in progress" },
+            { time: 30, equipment: "fo-lu800pro-001", action: "set-battery", value: 78, description: "Battery draining during aerial coverage" },
+            { time: 40, equipment: "fo-lu800pro-001", action: "degrade-link", linkIndex: 0, signal: 3, description: "⚠️ AT&T signal weak at altitude" },
+            { time: 50, equipment: "fo-lu800pro-001", action: "degrade-link", linkIndex: 1, signal: 2, description: "🔴 Verizon signal degrading - switching to sat" },
+            { time: 55, equipment: "fo-lu800pro-001", action: "restore-link", linkIndex: 2, signal: 5, description: "✅ Satellite link active - stable feed" },
+            { time: 70, equipment: "fo-lu600-001", action: "online", description: "Ground unit deploying" },
+            { time: 80, equipment: "fo-lu600-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-2", description: "Ground perspective added to coverage" },
+            { time: 95, equipment: "fo-lu800pro-001", action: "set-battery", value: 52, description: "⚠️ Helicopter battery at 52%" },
+            { time: 110, equipment: "fo-lu800pro-001", action: "restore-link", linkIndex: 0, signal: 5, description: "✅ Cellular restored - lower altitude" },
+            { time: 130, equipment: "fo-lu800pro-001", action: "stop-streaming", description: "Helicopter returns to base" },
+            { time: 140, equipment: "fo-lu600-001", action: "stop-streaming", description: "Coverage wrap" }
+        ]
+    },
+    multisite: {
+        name: "Multi-City Production",
+        inventory: "broadcast-center",
+        events: [
+            { time: 5, equipment: "bc-lu2000-001", action: "online", description: "Broadcast center ready" },
+            { time: 10, equipment: "bc-lu800pro-001", action: "online", description: "Studio Camera A ready" },
+            { time: 15, equipment: "bc-lu800pro-001", action: "streaming", destination: "broadcast-center:bc-lu2000-001:channel:Channel-1", description: "🎬 Studio desk cam LIVE" },
+            { time: 25, equipment: "bc-lu800pro-002", action: "online", description: "Studio Camera B ready" },
+            { time: 30, equipment: "bc-lu800pro-002", action: "streaming", destination: "broadcast-center:bc-lu2000-001:channel:Channel-2", description: "Studio wide shot active" },
+            { time: 40, equipment: "bc-lu600-001", action: "online", description: "Mobile reporter coming online" },
+            { time: 50, equipment: "bc-lu600-001", action: "streaming", destination: "broadcast-center:bc-lu2000-001:channel:Channel-3", description: "📍 Reporter live from location" },
+            { time: 60, equipment: "bc-lu600-001", action: "set-battery", value: 58, description: "Reporter battery check" },
+            { time: 80, equipment: "bc-sdi-001", action: "online", description: "SDI output to master control" },
+            { time: 90, equipment: "bc-ndi-001", action: "online", description: "NDI output for production switcher" },
+            { time: 110, equipment: "bc-lu600-001", action: "set-battery", value: 32, description: "⚠️ Reporter battery low" },
+            { time: 130, equipment: "bc-lu600-001", action: "stop-streaming", description: "Reporter wraps" },
+            { time: 150, equipment: "bc-lu800pro-002", action: "stop-streaming", description: "Studio Camera B released" },
+            { time: 160, equipment: "bc-lu800pro-001", action: "stop-streaming", description: "Show complete" }
+        ]
+    },
+    globalbroadcast: {
+        name: "Global News Feed",
+        inventory: "cloud-setup",
+        events: [
+            { time: 5, equipment: "cl-cloudmmh-001", action: "online", description: "Cloud hub online" },
+            { time: 10, equipment: "cl-lu800hdr-001", action: "online", description: "Brazil correspondent ready" },
+            { time: 15, equipment: "cl-lu800hdr-001", action: "streaming", destination: "cloud-setup:cl-cloudmmh-001:channel:Cloud-Channel-1", description: "🌎 Live from Amazon - Documentary feed" },
+            { time: 25, equipment: "cl-lu800hdr-001", action: "degrade-link", linkIndex: 1, signal: 1, description: "⚠️ Local 4G failing in remote location" },
+            { time: 30, equipment: "cl-lu800hdr-001", action: "set-battery", value: 45, description: "🔋 Battery draining in field conditions" },
+            { time: 50, equipment: "cl-lu800hdr-001", action: "degrade-link", linkIndex: 0, signal: 3, description: "⚠️ Starlink signal degraded - weather" },
+            { time: 65, equipment: "cl-lu800hdr-001", action: "restore-link", linkIndex: 0, signal: 5, description: "✅ Starlink recovered - clear skies" },
+            { time: 75, equipment: "cl-lu800hdr-001", action: "set-battery", value: 28, description: "🔴 Critical battery - 28% remaining" },
+            { time: 90, equipment: "cl-sdi-001", action: "online", description: "SDI feed to broadcast" },
+            { time: 100, equipment: "cl-ndi-001", action: "online", description: "NDI feed to production" },
+            { time: 120, equipment: "cl-lu800hdr-001", action: "set-battery", value: 15, description: "🔴 CRITICAL - Battery nearly depleted" },
+            { time: 135, equipment: "cl-lu800hdr-001", action: "stop-streaming", description: "Emergency battery save - feed ends" }
+        ]
+    },
+    rapidresponse: {
+        name: "Rapid Deployment",
+        inventory: "field-ops",
+        events: [
+            { time: 3, equipment: "fo-lu4000-001", action: "online", description: "⚡ Field server RAPID START" },
+            { time: 8, equipment: "fo-lu600-001", action: "online", description: "Unit 1 deploying" },
+            { time: 12, equipment: "fo-lu600-002", action: "online", description: "Unit 2 deploying" },
+            { time: 15, equipment: "fo-lu600-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-1", description: "🔴 Unit 1 LIVE - first on scene" },
+            { time: 20, equipment: "fo-lu600-002", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-2", description: "🔴 Unit 2 LIVE - second angle" },
+            { time: 30, equipment: "fo-lu610-001", action: "online", description: "Sports unit redirected to scene" },
+            { time: 35, equipment: "fo-lu610-001", action: "streaming", destination: "field-ops:fo-lu2000-001:channel:Channel-1", description: "Third feed added - wide coverage" },
+            { time: 50, equipment: "fo-lu600-001", action: "set-battery", value: 62, description: "Unit 1 battery check" },
+            { time: 55, equipment: "fo-lu600-002", action: "set-battery", value: 55, description: "Unit 2 battery check" },
+            { time: 70, equipment: "fo-lu800pro-001", action: "online", description: "⚡ Helicopter arriving" },
+            { time: 75, equipment: "fo-lu800pro-001", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-3", description: "🚁 Aerial view added - 4 camera operation" },
+            { time: 90, equipment: "fo-lu600-001", action: "set-battery", value: 38, description: "⚠️ Unit 1 battery low" },
+            { time: 100, equipment: "fo-lu600-002", action: "set-battery", value: 28, description: "⚠️ Unit 2 battery critical" },
+            { time: 105, equipment: "fo-lu610-002", action: "online", description: "Backup van unit ready" },
+            { time: 120, equipment: "fo-lu600-002", action: "stop-streaming", description: "Unit 2 battery swap" },
+            { time: 125, equipment: "fo-lu610-002", action: "streaming", destination: "field-ops:fo-lu4000-001:channel:Channel-2", description: "Van unit takes over channel 2" },
+            { time: 150, equipment: "fo-lu800pro-001", action: "stop-streaming", description: "Helicopter returns to base" },
+            { time: 170, equipment: "fo-lu600-001", action: "stop-streaming", description: "Unit 1 wrap" },
+            { time: 175, equipment: "fo-lu610-001", action: "stop-streaming", description: "Sports unit released" },
+            { time: 180, equipment: "fo-lu610-002", action: "stop-streaming", description: "All clear - coverage complete" }
+        ]
+    },
+    studioshow: {
+        name: "Live Studio Show",
+        inventory: "studio-production",
+        events: [
+            { time: 5, equipment: "st-lu2000-001", action: "online", description: "Studio server online" },
+            { time: 10, equipment: "st-lu800pro-001", action: "online", description: "Camera 1 (Anchor) ready" },
+            { time: 12, equipment: "st-lu800pro-002", action: "online", description: "Camera 2 (Guest) ready" },
+            { time: 14, equipment: "st-lu800pro-003", action: "online", description: "Camera 3 (Wide) ready" },
+            { time: 20, equipment: "st-lu800pro-001", action: "streaming", destination: "studio-production:st-lu2000-001:channel:Studio-A", description: "🎬 Camera 1 LIVE - Anchor" },
+            { time: 25, equipment: "st-lu800pro-002", action: "streaming", destination: "studio-production:st-lu2000-001:channel:Studio-B", description: "🎬 Camera 2 LIVE - Guest" },
+            { time: 30, equipment: "st-lu800pro-003", action: "streaming", destination: "studio-production:st-lu2000-001:channel:Studio-C", description: "🎬 Camera 3 LIVE - Wide shot" },
+            { time: 40, equipment: "st-sdi-output-001", action: "online", description: "SDI to master control" },
+            { time: 45, equipment: "st-ndi-output-001", action: "online", description: "NDI to production switcher" },
+            { time: 50, equipment: "st-srt-out-001", action: "online", description: "SRT stream to web" },
+            { time: 55, equipment: "st-rtmp-001", action: "online", description: "RTMP to social media" },
+            { time: 70, equipment: "st-lu600-001", action: "online", description: "Remote interview unit ready" },
+            { time: 75, equipment: "st-lu600-001", action: "streaming", destination: "studio-production:st-lu2000-001:channel:Studio-D", description: "📞 Remote guest joins via LiveU" },
+            { time: 100, equipment: "st-lu600-001", action: "set-battery", value: 72, description: "Remote guest battery check" },
+            { time: 130, equipment: "st-lu600-001", action: "stop-streaming", description: "Remote guest segment ends" },
+            { time: 150, equipment: "st-lu800pro-003", action: "stop-streaming", description: "Camera 3 released" },
+            { time: 160, equipment: "st-lu800pro-002", action: "stop-streaming", description: "Camera 2 released" },
+            { time: 170, equipment: "st-lu800pro-001", action: "stop-streaming", description: "Show wrap - all cameras clear" }
         ]
     }
 };
