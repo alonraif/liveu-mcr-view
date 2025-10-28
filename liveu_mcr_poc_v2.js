@@ -2987,8 +2987,12 @@ function redrawConnections() {
         if (!fromKey || !toKey) return;
 
         const pairKey = `${fromKey}=>${toKey}`;
-        if (connectionSet.has(pairKey)) return;
+        if (connectionSet.has(pairKey)) {
+            console.log(`[DUPLICATE CONNECTION BLOCKED] ${pairKey} already exists`);
+            return;
+        }
         connectionSet.add(pairKey);
+        console.log(`[CONNECTION ADDED] ${pairKey}`);
 
         const line = createConnectionLine(fromId, toId, { type, containerRect, canvasRect, ...anchors });
         if (line) {
@@ -3023,8 +3027,13 @@ function redrawConnections() {
 
                     // Build the encoder-specific connection key to ensure one encoder = one connection
                     const encoderKey = `${item.id}:encoder-${encoder.id}`;
-                    if (connectionSet.has(encoderKey)) return; // This encoder already has a connection
+                    if (connectionSet.has(encoderKey)) {
+                        console.log(`[DUPLICATE BLOCKED] Encoder ${encoder.id} on ${item.name} already has connection`);
+                        return;
+                    }
                     connectionSet.add(encoderKey);
+
+                    console.log(`[UNIT→SERVER] Drawing connection: ${item.name} encoder-${encoder.id} → ${target.equipment.name}`);
 
                     addConnection(item.id, target.equipment.id, connectionType, {
                         fromSelector: buildEncoderSelector(encoder.id, 'output'),
@@ -3056,6 +3065,8 @@ function redrawConnections() {
                     if (unit && unit.id !== item.id) {
                         const connectionType = channel.status === 'streaming' ? 'streaming' : channel.status === 'connected' ? 'idle' : null;
                         if (connectionType) {
+                            console.log(`[SERVER→UNIT REVERSE] Server ${item.name} channel ${channel.id} trying to draw connection from unit ${unit.name}`);
+
                             addConnection(unit.id, item.id, connectionType, {
                                 fromSelector: findStreamingEncoderSelector(unit, channel.id),
                                 toSelector: buildChannelSelector(channel.id, 'input')
