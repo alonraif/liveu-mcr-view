@@ -3082,6 +3082,8 @@ function redrawConnections() {
                     preferDownstream: true
                 });
                 if (channelTarget && channelTarget.equipment && channelTarget.equipment.id !== item.id) {
+                    console.log(`[SERVER DOWNSTREAM] Server ${item.name} channel ${channel.id} resolved target: ${channelTarget.equipment.name} (${channelTarget.equipment.type}) via ${channelTarget.via}`);
+
                     const connectionType = channel.status === 'streaming' ? 'streaming' : channel.status === 'connected' ? 'idle' : null;
                     if (connectionType) {
                         addConnection(item.id, channelTarget.equipment.id, connectionType, {
