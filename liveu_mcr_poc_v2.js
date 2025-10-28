@@ -923,6 +923,10 @@ let clockInterval = null;
 const STORAGE_AVAILABLE = supportsLocalStorage();
 
 let inventories = loadInventories();
+console.log('Loaded inventories:', Object.keys(inventories));
+Object.keys(inventories).forEach(key => {
+    console.log(`  ${key}: ${inventories[key].equipment.length} devices`);
+});
 enforceChannelStreamingConsistency();
 
 // LiveU Entity Definitions
@@ -4868,6 +4872,17 @@ function saveInventories() {
         window.localStorage.setItem(STORAGE_KEYS.inventories, JSON.stringify(inventories));
     } catch (error) {
         console.warn('Failed to persist inventories to storage.', error);
+    }
+}
+
+function resetInventoriesToDefaults() {
+    if (confirm('This will reset all inventories to default settings and remove any custom equipment. Continue?')) {
+        inventories = deepClone(DEFAULT_INVENTORIES);
+        saveInventories();
+        populateInventoryDropdowns();
+        renderMCR();
+        updateEquipmentList();
+        showAlert('Inventories reset to defaults', 'success');
     }
 }
 

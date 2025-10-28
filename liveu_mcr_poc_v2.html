@@ -71,8 +71,11 @@
         <!-- Inventory Manager Page -->
         <div id="inventoryPage" class="page">
             <div class="management-page">
-                <h1 class="page-title">Inventory Manager</h1>
-                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h1 class="page-title">Inventory Manager</h1>
+                    <button class="btn btn-danger" onclick="resetInventoriesToDefaults()">Reset to Defaults</button>
+                </div>
+
                 <div class="section">
                     <h2 class="section-title" id="equipmentFormTitle">Add New Equipment</h2>
                     <div class="form-grid">
