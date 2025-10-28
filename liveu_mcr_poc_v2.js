@@ -1363,6 +1363,68 @@ function selectInventory(silent = false, overrideKey) {
     updateEquipmentList();
 }
 
+// Auto-Layout System
+function autoLayoutEquipment(equipment) {
+    const COLUMN_WIDTH = 350;
+    const ROW_HEIGHT = 280;
+    const MIN_SPACING = 40;
+    const START_X = 100;
+    const START_Y = 100;
+
+    // Categorize equipment by signal flow position
+    const sources = []; // Units (encoders)
+    const middle = [];  // Servers, transceivers
+    const destinations = []; // Outputs, ingest servers
+
+    equipment.forEach(item => {
+        if (item.type === 'unit') {
+            sources.push(item);
+        } else if (item.type === 'server' || item.type === 'transceiver' || item.type === 'srt-in') {
+            middle.push(item);
+        } else if (item.type === 'destination' || item.type === 'ingest') {
+            destinations.push(item);
+        } else {
+            middle.push(item); // Default to middle
+        }
+    });
+
+    // Layout function for a column
+    function layoutColumn(items, columnX) {
+        let currentY = START_Y;
+        const positions = [];
+
+        items.forEach(item => {
+            positions.push({ x: columnX, y: currentY });
+            currentY += ROW_HEIGHT;
+        });
+
+        return positions;
+    }
+
+    // Calculate positions for each group
+    const sourcePositions = layoutColumn(sources, START_X);
+    const middlePositions = layoutColumn(middle, START_X + COLUMN_WIDTH);
+    const destPositions = layoutColumn(destinations, START_X + COLUMN_WIDTH * 2);
+
+    // Apply positions to equipment
+    sources.forEach((item, i) => {
+        item.x = sourcePositions[i].x;
+        item.y = sourcePositions[i].y;
+    });
+
+    middle.forEach((item, i) => {
+        item.x = middlePositions[i].x;
+        item.y = middlePositions[i].y;
+    });
+
+    destinations.forEach((item, i) => {
+        item.x = destPositions[i].x;
+        item.y = destPositions[i].y;
+    });
+
+    return equipment;
+}
+
 // MCR Rendering
 function renderMCR() {
     const container = document.getElementById('mcrContainer');
@@ -1670,6 +1732,7 @@ function createCanvasControls() {
         { control: 'zoom-in', icon: '+', label: 'Zoom In', action: zoomIn },
         { control: 'zoom-out', icon: '−', label: 'Zoom Out', action: zoomOut },
         { control: 'fit', icon: '⌖', label: 'Fit to View', action: resetZoom },
+        { control: 'layout', icon: '⚡', label: 'Auto Layout', action: applyAutoLayout },
         { control: 'refresh', icon: '⟳', label: 'Refresh', action: refreshMCR },
         { control: 'connections', icon: '⛓', label: 'Toggle Connections', action: () => toggleConnections() },
         { control: 'auto', icon: '⏱', label: 'Toggle Auto Refresh', action: () => toggleAutoRefresh() }
@@ -4938,6 +5001,27 @@ function resetInventoriesToDefaults() {
         updateEquipmentList();
         showAlert('Inventories reset to defaults', 'success');
     }
+}
+
+function applyAutoLayout() {
+    if (!currentInventory || !inventories[currentInventory]) {
+        showAlert('Please select an inventory first', 'warning');
+        return;
+    }
+
+    const equipment = inventories[currentInventory].equipment;
+    if (!equipment || equipment.length === 0) {
+        showAlert('No equipment to layout', 'warning');
+        return;
+    }
+
+    // Apply auto-layout algorithm
+    autoLayoutEquipment(equipment);
+
+    // Save and refresh
+    saveInventories();
+    renderMCR();
+    showAlert('Auto-layout applied successfully', 'success');
 }
 
 function loadScriptEvents() {
