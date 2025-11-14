@@ -1,5 +1,5 @@
 // Version tracking for cache busting
-const APP_VERSION = '20250128-005';
+const APP_VERSION = '20250128-006';
 console.log(`%c🚀 LiveU MCR Dashboard v${APP_VERSION}`, 'color: #4CAF50; font-weight: bold; font-size: 14px;');
 
 const STORAGE_KEYS = {
@@ -909,6 +909,356 @@ const DEFAULT_INVENTORIES = {
                 connectedChannel: null
             }
         ]
+    },
+    'hackathon-demo': {
+        name: 'Hackathon Demo - News Broadcast',
+        equipment: [
+            // ========== FLOW 1 (TOP SECTION) ==========
+
+            // SDI Source (Flow 1 - Left)
+            {
+                id: 'hd-sdi-source-001',
+                name: 'SDI-Source',
+                product: 'SDI',
+                status: 'online',
+                x: 100,
+                y: 100,
+                type: 'destination',
+                connectedChannel: null
+            },
+
+            // LU800-HDR Unit (Flow 1)
+            {
+                id: 'hd-lu800hdr-001',
+                name: 'LU800-HDR',
+                product: 'LU800-HDR',
+                mode: '1080p50',
+                uptime: '4h 12m',
+                status: 'streaming',
+                x: 400,
+                y: 100,
+                type: 'unit',
+                channel: 'MMH-Instance-1',
+                encoders: [
+                    { id: 1, status: 'streaming', channel: 'MMH-Instance-1' }
+                ],
+                bandwidth: { current: 2000, max: 8000 },
+                alerts: [],
+                onAir: false,
+                battery: { percentage: 85, remainingMinutes: 180, charging: false },
+                delay: 0,
+                videoReturn: true,
+                location: 'Field Reporter',
+                links: [
+                    { name: 'Modem 1', signal: 5, bandwidth: 250, connected: true, type: '4g' },
+                    { name: 'Modem 2', signal: 4, bandwidth: 250, connected: true, type: '4g' },
+                    { name: 'Modem 3', signal: 5, bandwidth: 250, connected: true, type: '4g' },
+                    { name: 'Modem 4', signal: 3, bandwidth: 250, connected: true, type: '4g' },
+                    { name: 'Modem 5', signal: 4, bandwidth: 250, connected: true, type: '4g' },
+                    { name: 'Modem 6', signal: 5, bandwidth: 250, connected: true, type: '4g' },
+                    { name: 'Modem 7', signal: 4, bandwidth: 250, connected: true, type: '5g' },
+                    { name: 'Modem 8', signal: 5, bandwidth: 300, connected: true, type: '5g' }
+                ]
+            },
+
+            // Audio Room (Flow 1 - Top)
+            {
+                id: 'hd-audio-room-001',
+                name: 'Audio-room',
+                product: 'IFB Conference',
+                status: 'online',
+                x: 400,
+                y: 10,
+                type: 'destination',
+                connectedChannel: 'Audio-Device'
+            },
+
+            // Audio Device (Flow 1 - Top Right)
+            {
+                id: 'hd-audio-device-001',
+                name: 'Audio-device',
+                product: 'A/D Converter',
+                status: 'online',
+                x: 750,
+                y: 10,
+                type: 'destination',
+                connectedChannel: 'MMH-Audio-Channel'
+            },
+
+            // MMH Server (Flow 1 - Middle)
+            {
+                id: 'hd-mmh-001',
+                name: 'MMH',
+                product: 'Cloud-MMH',
+                status: 'streaming',
+                x: 750,
+                y: 100,
+                type: 'server',
+                channels: [
+                    { id: 'Instance-1', status: 'streaming', connectedUnit: 'hd-lu800hdr-001', recording: false }
+                ]
+            },
+
+            // Video Return Server (Flow 1 - Bottom)
+            {
+                id: 'hd-vr-001',
+                name: 'Video-Return',
+                product: 'VR Server',
+                status: 'online',
+                x: 400,
+                y: 300,
+                type: 'server',
+                channels: [
+                    { id: 'Instance-1', status: 'idle', connectedUnit: null, recording: false }
+                ]
+            },
+
+            // SDI Source for VR (Flow 1 - Bottom Left)
+            {
+                id: 'hd-sdi-source-002',
+                name: 'SDI-Source',
+                product: 'SDI',
+                status: 'online',
+                x: 100,
+                y: 300,
+                type: 'destination',
+                connectedChannel: 'VR-Instance-1'
+            },
+
+            // Ingest Server (Flow 1 - Right)
+            {
+                id: 'hd-ingest-001',
+                name: 'Ingest-server',
+                product: 'Recording Server',
+                status: 'streaming',
+                x: 1100,
+                y: 100,
+                type: 'ingest',
+                associatedChannels: ['Instance-1'],
+                activeRecordings: [
+                    { id: 'rec-001', channel: 'Instance-1', duration: '00:15:32', size: '2.4 GB' }
+                ],
+                storage: { used: 1250, total: 10000 }
+            },
+
+            // S3 Hotfolder (Flow 1 - Far Right)
+            {
+                id: 'hd-s3-001',
+                name: 'S3-hotfolder-Connected',
+                product: 'AWS S3',
+                status: 'online',
+                x: 1450,
+                y: 100,
+                type: 'destination',
+                connectedChannel: 'Ingest-server'
+            },
+
+            // SRT Listener Decoder (Flow 1 - Right Middle)
+            {
+                id: 'hd-srt-listener-001',
+                name: 'SRT-Listener-decoder',
+                product: 'SRT Decoder',
+                status: 'streaming',
+                x: 1100,
+                y: 250,
+                type: 'destination',
+                connectedChannel: 'Instance-1'
+            },
+
+            // Matrix Pool Channel (Flow 1 - Right Bottom)
+            {
+                id: 'hd-matrix-pool-001',
+                name: 'Matrix-Pool-channel',
+                product: 'Matrix Router',
+                status: 'streaming',
+                x: 1100,
+                y: 400,
+                type: 'destination',
+                connectedChannel: 'Instance-1'
+            },
+
+            // ========== FLOW 2 (BOTTOM SECTION) ==========
+
+            // SDI Source (Flow 2 - Left)
+            {
+                id: 'hd-sdi-source-003',
+                name: 'SDI-Source',
+                product: 'SDI',
+                status: 'online',
+                x: 100,
+                y: 600,
+                type: 'destination',
+                connectedChannel: 'Transceiver-Instance-1'
+            },
+
+            // Transceiver (Flow 2)
+            {
+                id: 'hd-transceiver-001',
+                name: 'Transceiver',
+                product: 'LU300',
+                status: 'streaming',
+                x: 400,
+                y: 600,
+                type: 'transceiver',
+                config: '2E/2D',
+                encoders: [
+                    { id: 1, status: 'streaming', channel: 'Matrix-DC' }
+                ],
+                decoders: [
+                    { id: 1, status: 'idle', channel: null }
+                ]
+            },
+
+            // Matrix DC (Flow 2 - Distribution Channel)
+            {
+                id: 'hd-matrix-dc-001',
+                name: 'Matrix-DC',
+                product: 'Cloud-MMH',
+                status: 'streaming',
+                x: 700,
+                y: 600,
+                type: 'server',
+                channels: [
+                    { id: 'DC-Channel', status: 'streaming', connectedUnit: 'hd-transceiver-001', recording: false }
+                ]
+            },
+
+            // MMH Instance 2 (Flow 2)
+            {
+                id: 'hd-mmh-002',
+                name: 'MMH',
+                product: 'Cloud-MMH',
+                status: 'streaming',
+                x: 1050,
+                y: 550,
+                type: 'server',
+                channels: [
+                    { id: 'Instance-2', status: 'streaming', connectedUnit: null, recording: false }
+                ]
+            },
+
+            // MMH Instance 3 (Flow 2)
+            {
+                id: 'hd-mmh-003',
+                name: 'MMH',
+                product: 'Cloud-MMH',
+                status: 'streaming',
+                x: 1050,
+                y: 700,
+                type: 'server',
+                channels: [
+                    { id: 'Instance-3', status: 'streaming', connectedUnit: null, recording: false }
+                ]
+            },
+
+            // Nexus RTMP Destination (Flow 2)
+            {
+                id: 'hd-nexus-rtmp-001',
+                name: 'Nexus-RTMP-out-destination',
+                product: 'RTMP',
+                status: 'streaming',
+                x: 1400,
+                y: 700,
+                type: 'destination',
+                connectedChannel: 'Instance-3',
+                bandwidth: { current: 5000, max: 10000 }
+            },
+
+            // SRT Encoder Caller (Flow 2 - Bottom)
+            {
+                id: 'hd-srt-encoder-001',
+                name: 'SRT-encoder-Caller',
+                product: 'SRT Encoder',
+                status: 'streaming',
+                x: 100,
+                y: 900,
+                type: 'unit',
+                channel: 'Matrix-SRT-In',
+                encoders: [
+                    { id: 1, status: 'streaming', channel: 'Matrix-SRT-In' }
+                ],
+                bandwidth: { current: 7000, max: 10000 }
+            },
+
+            // Matrix SRT In Listener (Flow 2)
+            {
+                id: 'hd-matrix-srt-001',
+                name: 'Matrix-SRT-In-Listener',
+                product: 'Cloud-MMH',
+                status: 'streaming',
+                x: 400,
+                y: 900,
+                type: 'server',
+                channels: [
+                    { id: 'SRT-In', status: 'streaming', connectedUnit: 'hd-srt-encoder-001', recording: false }
+                ]
+            },
+
+            // Cloud MMH SRT Out (Flow 2)
+            {
+                id: 'hd-cloud-mmh-srt-001',
+                name: 'Cloud-MMH-SRT-out-Caller',
+                product: 'Cloud-MMH',
+                status: 'streaming',
+                x: 700,
+                y: 900,
+                type: 'server',
+                channels: [
+                    { id: 'SRT-Out', status: 'streaming', connectedUnit: null, recording: false }
+                ]
+            },
+
+            // Matrix Recorder (Flow 2)
+            {
+                id: 'hd-matrix-recorder-001',
+                name: 'Matrix-recorder',
+                product: 'Recording Server',
+                status: 'streaming',
+                x: 1000,
+                y: 850,
+                type: 'ingest',
+                associatedChannels: ['SRT-Out'],
+                activeRecordings: [
+                    { id: 'rec-002', channel: 'SRT-Out', duration: '00:22:15', size: '3.8 GB' }
+                ],
+                storage: { used: 3800, total: 20000 }
+            },
+
+            // Cloud VR SRT Listener (Flow 2)
+            {
+                id: 'hd-cloud-vr-001',
+                name: 'Cloud-VR-SRT-Listener',
+                product: 'VR Server',
+                status: 'streaming',
+                x: 1000,
+                y: 1000,
+                type: 'server',
+                channels: [
+                    { id: 'VR-SRT', status: 'streaming', connectedUnit: null, recording: false }
+                ]
+            },
+
+            // LU900Q VR Connected (Flow 2 - Bottom Right)
+            {
+                id: 'hd-lu900q-001',
+                name: 'LU900Q-VR-connected',
+                product: 'LU900Q',
+                mode: '1080p50',
+                uptime: '2h 45m',
+                status: 'streaming',
+                x: 1300,
+                y: 1000,
+                type: 'unit',
+                channel: null,
+                encoders: [
+                    { id: 1, status: 'streaming', channel: null }
+                ],
+                bandwidth: { current: 3500, max: 8000 },
+                videoReturn: true,
+                location: 'Remote Studio',
+                battery: { percentage: 92, remainingMinutes: 240, charging: false }
+            }
+        ]
     }
 };
 
@@ -1409,7 +1759,7 @@ function autoLayoutEquipment(equipment) {
     equipment.forEach(item => {
         if (item.type === 'unit') {
             sources.push(item);
-        } else if (item.type === 'server' || item.type === 'transceiver' || item.type === 'srt-in') {
+        } else if (item.type === 'server' || item.type === 'channel' || item.type === 'transceiver' || item.type === 'srt-in') {
             middle.push(item);
         } else if (item.type === 'destination' || item.type === 'ingest') {
             destinations.push(item);
