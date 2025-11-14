@@ -1,5 +1,5 @@
 // Version tracking for cache busting
-const APP_VERSION = '20250128-006';
+const APP_VERSION = '20250128-007';
 console.log(`%c🚀 LiveU MCR Dashboard v${APP_VERSION}`, 'color: #4CAF50; font-weight: bold; font-size: 14px;');
 
 const STORAGE_KEYS = {
@@ -5554,7 +5554,28 @@ function loadInventories() {
 
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-            return parsed;
+            // Merge in any new default inventories that don't exist in storage
+            const merged = { ...parsed };
+            let hasNewInventories = false;
+
+            Object.keys(DEFAULT_INVENTORIES).forEach(key => {
+                if (!merged[key]) {
+                    merged[key] = deepClone(DEFAULT_INVENTORIES[key]);
+                    hasNewInventories = true;
+                    console.log(`Added new inventory: ${key}`);
+                }
+            });
+
+            // Save back to storage if we added new inventories
+            if (hasNewInventories && STORAGE_AVAILABLE) {
+                try {
+                    window.localStorage.setItem(STORAGE_KEYS.inventories, JSON.stringify(merged));
+                } catch (e) {
+                    console.warn('Failed to save merged inventories', e);
+                }
+            }
+
+            return merged;
         }
     } catch (error) {
         console.warn('Failed to load inventories from storage, using defaults instead.', error);
