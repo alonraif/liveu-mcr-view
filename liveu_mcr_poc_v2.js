@@ -1,5 +1,5 @@
 // Version tracking for cache busting
-const APP_VERSION = '20250128-004';
+const APP_VERSION = '20250128-005';
 console.log(`%c🚀 LiveU MCR Dashboard v${APP_VERSION}`, 'color: #4CAF50; font-weight: bold; font-size: 14px;');
 
 const STORAGE_KEYS = {
@@ -1495,6 +1495,38 @@ function updateEquipmentNodes(equipmentIds) {
     });
 }
 
+// Expand equipment into renderable entities
+// Servers with channels become multiple channel entities
+function expandEquipmentForRendering(equipment) {
+    const expanded = [];
+
+    equipment.forEach(item => {
+        if (item.type === 'server' && item.channels && item.channels.length > 0) {
+            // Create separate entity for each channel
+            item.channels.forEach((channel, index) => {
+                const channelEntity = {
+                    id: `${item.id}-channel-${channel.id}`,
+                    type: 'channel',
+                    name: channel.id || `Channel-${index + 1}`,
+                    parentServer: item.id,
+                    parentServerName: item.name,
+                    product: item.product,
+                    channel: channel,
+                    status: channel.status || 'online',
+                    x: item.x + (index * 300), // Offset channels horizontally
+                    y: item.y
+                };
+                expanded.push(channelEntity);
+            });
+        } else {
+            // Non-server equipment or servers without channels render normally
+            expanded.push(item);
+        }
+    });
+
+    return expanded;
+}
+
 // MCR Rendering
 function renderMCR() {
     const container = document.getElementById('mcrContainer');
@@ -1509,7 +1541,8 @@ function renderMCR() {
         return;
     }
 
-    const equipment = inventories[currentInventory].equipment || [];
+    const rawEquipment = inventories[currentInventory].equipment || [];
+    const equipment = expandEquipmentForRendering(rawEquipment);
 
     if (!container.dataset.zoomBound) {
         container.addEventListener('wheel', handleCanvasWheel, { passive: false });
@@ -1982,7 +2015,14 @@ function determineEquipmentStatus(equipment) {
     if (explicitStatus === 'streaming') return 'streaming';
     if (explicitStatus === 'connected') return 'connected';
 
-    if (equipment.type === 'unit') {
+    if (equipment.type === 'channel') {
+        // Channel status is based on the channel object
+        const channelStatus = (equipment.channel?.status || equipment.status || '').toLowerCase();
+        if (channelStatus === 'streaming') return 'streaming';
+        if (channelStatus === 'connected') return 'connected';
+        return 'online';
+
+    } else if (equipment.type === 'unit') {
         const hasStreamingEncoder = equipment.encoders?.some(enc => enc.status === 'streaming');
         const hasConnectedEncoder = equipment.encoders?.some(enc => enc.status === 'connected');
 
@@ -2032,12 +2072,14 @@ function determineEquipmentStatus(equipment) {
 
 function createEquipmentHTML(equipment, statusClass) {
     const alerts = createAlertsHTML(equipment);
-    
+
     switch (equipment.type) {
         case 'unit':
             return createUnitHTML(equipment, statusClass) + alerts;
         case 'server':
             return createServerHTML(equipment, statusClass) + alerts;
+        case 'channel':
+            return createChannelHTML(equipment, statusClass) + alerts;
         case 'transceiver':
             return createTransceiverHTML(equipment, statusClass) + alerts;
         case 'ingest':
@@ -2202,6 +2244,28 @@ function createServerHTML(equipment, statusClass) {
         </div>
         ${channelsHTML ? `<div class="channels-container">${channelsHTML}</div>` : ''}
         ${instancesHTML ? `<div class="server-instances">${instancesHTML}</div>` : ''}
+    `;
+}
+
+function createChannelHTML(equipment, statusClass) {
+    const channel = equipment.channel || {};
+    const connectedUnitText = channel.connectedUnit ? `<br>📡 Unit: ${channel.connectedUnit}` : '';
+    const recordingBadge = channel.recording ? ' 🔴' : '';
+
+    return `
+        <div class="node-header">
+            <div class="node-title">${equipment.name}</div>
+            <div class="node-status ${statusClass}">${statusClass.toUpperCase()}${recordingBadge}</div>
+        </div>
+        <div class="node-info">
+            Server: ${equipment.parentServerName || 'Unknown'}<br>
+            Product: ${equipment.product || 'LU2000'}
+            ${connectedUnitText}
+        </div>
+        <div class="channel-connectors">
+            <span class="connector-anchor input" data-channel-id="${escapeAttribute(equipment.name)}" data-anchor-side="input" data-anchor-type="channel"></span>
+            <span class="connector-anchor output" data-channel-id="${escapeAttribute(equipment.name)}" data-anchor-side="output" data-anchor-type="channel"></span>
+        </div>
     `;
 }
 
