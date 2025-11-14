@@ -1,5 +1,5 @@
 // Version tracking for cache busting
-const APP_VERSION = '20250128-007';
+const APP_VERSION = '20250128-008';
 console.log(`%c🚀 LiveU MCR Dashboard v${APP_VERSION}`, 'color: #4CAF50; font-weight: bold; font-size: 14px;');
 
 const STORAGE_KEYS = {
@@ -938,9 +938,9 @@ const DEFAULT_INVENTORIES = {
                 x: 400,
                 y: 100,
                 type: 'unit',
-                channel: 'MMH-Instance-1',
+                channel: 'Instance-1',
                 encoders: [
-                    { id: 1, status: 'streaming', channel: 'MMH-Instance-1' }
+                    { id: 1, status: 'streaming', channel: 'Instance-1' }
                 ],
                 bandwidth: { current: 2000, max: 8000 },
                 alerts: [],
@@ -1102,7 +1102,7 @@ const DEFAULT_INVENTORIES = {
                 type: 'transceiver',
                 config: '2E/2D',
                 encoders: [
-                    { id: 1, status: 'streaming', channel: 'Matrix-DC' }
+                    { id: 1, status: 'streaming', channel: 'DC-Channel' }
                 ],
                 decoders: [
                     { id: 1, status: 'idle', channel: null }
@@ -1173,9 +1173,9 @@ const DEFAULT_INVENTORIES = {
                 x: 100,
                 y: 900,
                 type: 'unit',
-                channel: 'Matrix-SRT-In',
+                channel: 'SRT-In',
                 encoders: [
-                    { id: 1, status: 'streaming', channel: 'Matrix-SRT-In' }
+                    { id: 1, status: 'streaming', channel: 'SRT-In' }
                 ],
                 bandwidth: { current: 7000, max: 10000 }
             },
