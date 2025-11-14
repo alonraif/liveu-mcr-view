@@ -1,5 +1,5 @@
 // Version tracking for cache busting
-const APP_VERSION = '20250128-008';
+const APP_VERSION = '20250128-009';
 console.log(`%c🚀 LiveU MCR Dashboard v${APP_VERSION}`, 'color: #4CAF50; font-weight: bold; font-size: 14px;');
 
 const STORAGE_KEYS = {
@@ -996,6 +996,10 @@ const DEFAULT_INVENTORIES = {
                 type: 'server',
                 channels: [
                     { id: 'Instance-1', status: 'streaming', connectedUnit: 'hd-lu800hdr-001', recording: false }
+                ],
+                instances: [
+                    { name: 'SRT-Listener-decoder', status: 'streaming' },
+                    { name: 'Matrix-Pool-channel', status: 'streaming' }
                 ]
             },
 
@@ -1120,6 +1124,10 @@ const DEFAULT_INVENTORIES = {
                 type: 'server',
                 channels: [
                     { id: 'DC-Channel', status: 'streaming', connectedUnit: 'hd-transceiver-001', recording: false }
+                ],
+                instances: [
+                    { name: 'Instance-2', status: 'streaming' },
+                    { name: 'Instance-3', status: 'streaming' }
                 ]
             },
 
@@ -1191,6 +1199,9 @@ const DEFAULT_INVENTORIES = {
                 type: 'server',
                 channels: [
                     { id: 'SRT-In', status: 'streaming', connectedUnit: 'hd-srt-encoder-001', recording: false }
+                ],
+                instances: [
+                    { name: 'SRT-Out', status: 'streaming' }
                 ]
             },
 
@@ -1205,6 +1216,10 @@ const DEFAULT_INVENTORIES = {
                 type: 'server',
                 channels: [
                     { id: 'SRT-Out', status: 'streaming', connectedUnit: null, recording: false }
+                ],
+                instances: [
+                    { name: 'Matrix-recorder', status: 'streaming' },
+                    { name: 'Cloud-VR-SRT', status: 'streaming' }
                 ]
             },
 
